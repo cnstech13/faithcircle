@@ -1,0 +1,3699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="theme-color"
+    content="#0b1f3a"
+  >
+
+  <title>Home | FaithCircle</title>
+
+  <link rel="stylesheet" href="global.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <style>
+    :root {
+      --cns-navy: #0b1f3a;
+      --cns-blue: #1769ff;
+      --cns-aqua: #35e0d0;
+      --cns-bg: #f3f6fb;
+      --cns-white: #ffffff;
+      --cns-text: #1e293b;
+      --cns-muted: #64748b;
+      --cns-border: #e2e8f0;
+      --cns-danger: #dc2626;
+      --cns-radius: 16px;
+      --cns-shadow: 0 5px 22px rgba(15, 23, 42, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: var(--cns-bg);
+      color: var(--cns-text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body.viewer-open {
+      overflow: hidden;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    img {
+      max-width: 100%;
+    }
+
+    /* ==============================
+       TOP NAVIGATION
+    ============================== */
+
+    .cns-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--cns-navy);
+      color: white;
+      box-shadow: 0 3px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .cns-topbar-inner {
+      max-width: 1250px;
+      min-height: 68px;
+      padding: 10px 18px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .cns-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .cns-brand-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--cns-blue);
+      color: white;
+      font-size: 19px;
+      font-weight: 900;
+    }
+
+    .cns-brand-name {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .cns-brand-name span {
+      color: var(--cns-aqua);
+    }
+
+    .cns-nav-links {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .cns-nav-links a,
+    .cns-nav-links button {
+      padding: 10px 12px;
+      border: 0;
+      border-radius: 9px;
+      background: transparent;
+      color: white;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .cns-nav-links a:hover,
+    .cns-nav-links a.active,
+    .cns-nav-links button:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .cns-nav-links .logout-link {
+      color: #fecaca;
+    }
+
+    /* ==============================
+       PAGE LAYOUT
+    ============================== */
+
+    .cns-layout {
+      width: min(1200px, 100%);
+      margin: 24px auto;
+      padding: 0 16px 40px;
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      align-items: start;
+      gap: 22px;
+    }
+
+    .cns-card {
+      min-width: 0;
+      background: var(--cns-white);
+      border: 1px solid var(--cns-border);
+      border-radius: var(--cns-radius);
+      box-shadow: var(--cns-shadow);
+    }
+
+    /* ==============================
+       SIDEBAR
+    ============================== */
+
+    .cns-sidebar {
+      position: sticky;
+      top: 88px;
+      overflow: hidden;
+    }
+
+    .cns-sidebar-cover {
+      height: 85px;
+      background: linear-gradient(
+        135deg,
+        var(--cns-navy),
+        var(--cns-blue),
+        var(--cns-aqua)
+      );
+    }
+
+    .cns-sidebar-profile {
+      padding: 0 18px 20px;
+      text-align: center;
+    }
+
+    .cns-avatar {
+      width: 76px;
+      height: 76px;
+      display: grid;
+      place-items: center;
+      margin: -38px auto 12px;
+      border: 4px solid white;
+      border-radius: 50%;
+      background: #dbeafe;
+      color: var(--cns-navy);
+      font-size: 25px;
+      font-weight: 800;
+      object-fit: cover;
+    }
+
+    .cns-sidebar-name {
+      margin: 0 0 6px;
+      font-size: 18px;
+      overflow-wrap: anywhere;
+    }
+
+    .cns-sidebar-username {
+      margin: 0 0 12px;
+      color: var(--cns-muted);
+      font-size: 13px;
+    }
+
+    .cns-sidebar-bio {
+      margin: 0 0 12px;
+      color: #475569;
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .cns-sidebar-location {
+      color: var(--cns-muted);
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .cns-sidebar-actions {
+      padding: 15px;
+      border-top: 1px solid var(--cns-border);
+    }
+
+    .cns-sidebar-actions a {
+      display: block;
+      padding: 11px;
+      border-radius: 10px;
+      text-align: center;
+      color: var(--cns-blue);
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    .cns-sidebar-actions a:hover {
+      background: #eff6ff;
+    }
+
+    /* ==============================
+       MAIN FEED
+    ============================== */
+
+    .cns-main {
+      display: grid;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .cns-welcome {
+      padding: 20px;
+      color: white;
+      background: linear-gradient(
+        125deg,
+        var(--cns-navy),
+        #164da0
+      );
+      border-radius: var(--cns-radius);
+      box-shadow: var(--cns-shadow);
+    }
+
+    .cns-welcome h1 {
+      margin: 0 0 8px;
+      font-size: clamp(22px, 4vw, 29px);
+    }
+
+    .cns-welcome p {
+      margin: 0;
+      color: #dbeafe;
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    /* ==============================
+       POST COMPOSER
+    ============================== */
+
+    .cns-composer {
+      padding: 20px;
+    }
+
+    .cns-section-heading {
+      margin: 0 0 16px;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .cns-composer-top {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .cns-small-avatar {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: #dbeafe;
+      color: var(--cns-navy);
+      object-fit: cover;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+
+    .cns-composer-user {
+      min-width: 0;
+    }
+
+    .cns-composer-user strong {
+      display: block;
+      overflow-wrap: anywhere;
+    }
+
+    .cns-composer-user small {
+      display: block;
+      margin-top: 4px;
+      color: var(--cns-muted);
+    }
+
+    .cns-input,
+    .cns-textarea {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid var(--cns-border);
+      border-radius: 12px;
+      background: #f8fafc;
+      color: var(--cns-text);
+      outline: none;
+    }
+
+    .cns-input:focus,
+    .cns-textarea:focus {
+      border-color: var(--cns-blue);
+      box-shadow: 0 0 0 3px rgba(23, 105, 255, 0.1);
+    }
+
+    .cns-textarea {
+      min-height: 115px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .cns-counter {
+      display: block;
+      margin-top: 7px;
+      text-align: right;
+      color: var(--cns-muted);
+      font-size: 12px;
+    }
+
+    .cns-composer-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    .cns-photo-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 14px;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      color: #1d4ed8;
+      background: #eff6ff;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .cns-photo-label:hover {
+      background: #dbeafe;
+    }
+
+    .cns-photo-label input {
+      display: none;
+    }
+
+    .cns-primary-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 19px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--cns-blue);
+      color: white;
+      font-weight: 800;
+      font-size: 13px;
+      transition: background 0.2s;
+    }
+
+    .cns-primary-btn:hover {
+      background: #0b50d4;
+    }
+
+    .cns-primary-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .cns-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .cns-preview-item {
+      position: relative;
+      min-width: 0;
+      aspect-ratio: 1;
+    }
+
+    .cns-preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .cns-preview-remove {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 27px;
+      height: 27px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 0.85);
+      color: white;
+      font-size: 17px;
+    }
+
+    /* ==============================
+       FEED STATUS
+    ============================== */
+
+    .cns-feed-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 0 2px;
+    }
+
+    .cns-feed-heading h2 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .cns-refresh-btn {
+      padding: 9px 12px;
+      border: 1px solid var(--cns-border);
+      border-radius: 9px;
+      background: white;
+      color: var(--cns-navy);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .cns-feed-status {
+      padding: 20px;
+      text-align: center;
+      color: var(--cns-muted);
+      line-height: 1.6;
+    }
+
+    /* ==============================
+       POST CARD
+    ============================== */
+
+    .cns-post {
+      padding: 19px;
+      min-width: 0;
+      scroll-margin-top: 90px;
+    }
+
+    .cns-post-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .cns-post-avatar {
+      width: 47px;
+      height: 47px;
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #dbeafe;
+      color: var(--cns-navy);
+      object-fit: cover;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .cns-post-author {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .cns-post-author strong {
+      display: block;
+      margin: 2px 0 5px;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .cns-post-author small {
+      color: var(--cns-muted);
+      font-size: 12px;
+    }
+
+    .cns-post-content {
+      margin: 17px 0;
+      font-size: 14px;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .cns-post-images {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 7px;
+      margin: 12px 0;
+    }
+
+    .cns-post-images.single-image {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .cns-post-image {
+      width: 100%;
+      max-height: 420px;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 11px;
+      background: #e2e8f0;
+      cursor: zoom-in;
+    }
+
+    .cns-post-images.single-image .cns-post-image {
+      aspect-ratio: auto;
+      max-height: 520px;
+      object-fit: contain;
+      background: #f8fafc;
+    }
+
+    .cns-post-video {
+      display: block;
+      width: 100%;
+      max-height: 620px;
+      margin: 12px 0;
+      border-radius: 12px;
+      background: #05070b;
+      object-fit: contain;
+    }
+
+    .cns-video-preview {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #eef4ff;
+      color: #17345d;
+      overflow-wrap: anywhere;
+    }
+
+    .cns-video-preview video {
+      display: block;
+      width: 100%;
+      max-height: 220px;
+      margin-top: 8px;
+      border-radius: 8px;
+      background: #05070b;
+    }
+
+    .cns-post-stats {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding: 12px 0;
+      color: var(--cns-muted);
+      font-size: 12px;
+      border-bottom: 1px solid var(--cns-border);
+    }
+
+    .cns-post-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 7px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--cns-border);
+    }
+
+    .cns-action-btn {
+      flex: 1 1 auto;
+      min-width: 65px;
+      padding: 10px 9px;
+      border: 1px solid transparent;
+      border-radius: 9px;
+      background: #f8fafc;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .cns-action-btn:hover {
+      background: #eff6ff;
+      color: var(--cns-blue);
+    }
+
+    .cns-action-btn.liked {
+      background: #fef2f2;
+      color: #dc2626;
+    }
+
+    .cns-action-btn.edit {
+      color: #1d4ed8;
+      background: #eff6ff;
+    }
+
+    .cns-action-btn.delete {
+      color: #b91c1c;
+      background: #fef2f2;
+    }
+
+    .cns-action-btn.share {
+      color: #0f766e;
+      background: #f0fdfa;
+    }
+
+    /* ==============================
+       COMMENTS
+    ============================== */
+
+    .cns-comments {
+      padding-top: 15px;
+    }
+
+    .cns-comments-heading {
+      margin: 0 0 12px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .cns-comment {
+      padding: 11px 12px;
+      margin-bottom: 8px;
+      border-radius: 11px;
+      background: #f8fafc;
+    }
+
+    .cns-comment-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .cns-comment-author {
+      font-size: 12px;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .cns-comment-text {
+      margin-top: 6px;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    .cns-delete-comment {
+      padding: 3px 5px;
+      border: 0;
+      background: transparent;
+      color: var(--cns-danger);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .cns-comment-form {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .cns-comment-input {
+      flex: 1;
+      min-width: 0;
+      padding: 11px 12px;
+      border: 1px solid var(--cns-border);
+      border-radius: 10px;
+      outline: none;
+      font-size: 13px;
+    }
+
+    .cns-comment-input:focus {
+      border-color: var(--cns-blue);
+    }
+
+    .cns-comment-submit {
+      padding: 11px 13px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--cns-blue);
+      color: white;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    /* ==============================
+       IMAGE VIEWER
+    ============================== */
+
+    .cns-image-viewer {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(2, 8, 23, 0.96);
+    }
+
+    .cns-image-viewer.open {
+      display: flex;
+    }
+
+    .cns-image-viewer img {
+      display: block;
+      max-width: 100%;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .cns-viewer-close {
+      position: absolute;
+      top: 14px;
+      right: 15px;
+      width: 45px;
+      height: 45px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      color: white;
+      font-size: 27px;
+    }
+
+    /* No bottom navigation */
+    .cns-mobile-nav {
+      display: none !important;
+    }
+
+    /* ==============================
+       RESPONSIVE DESIGN
+    ============================== */
+
+    @media (max-width: 900px) {
+      .cns-layout {
+        grid-template-columns: 210px minmax(0, 1fr);
+        gap: 14px;
+      }
+
+      .cns-topbar-inner {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .cns-brand {
+        margin-right: auto;
+      }
+
+      .cns-nav-links {
+        width: 100%;
+        justify-content: flex-start;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding-bottom: 3px;
+      }
+
+      .cns-nav-links a,
+      .cns-nav-links button {
+        flex-shrink: 0;
+      }
+    }
+
+    @media (max-width: 650px) {
+      .cns-layout {
+        display: flex;
+        flex-direction: column;
+        padding: 0 10px 30px;
+        margin: 15px auto;
+      }
+
+      .cns-sidebar {
+        position: static;
+        width: 100%;
+      }
+
+      .cns-sidebar-cover {
+        height: 60px;
+      }
+
+      .cns-sidebar-profile {
+        padding-bottom: 15px;
+      }
+
+      .cns-sidebar-actions {
+        display: flex;
+        justify-content: center;
+        padding: 8px;
+      }
+
+      .cns-sidebar-actions a {
+        flex: 1;
+      }
+
+      .cns-main {
+        width: 100%;
+      }
+
+      .cns-welcome {
+        padding: 18px;
+      }
+
+      .cns-composer,
+      .cns-post {
+        padding: 14px;
+      }
+
+      .cns-post-images {
+        gap: 5px;
+      }
+
+      .cns-post-image {
+        max-height: 300px;
+      }
+
+      .cns-composer-actions {
+        align-items: stretch;
+      }
+
+      .cns-photo-label,
+      .cns-primary-btn {
+        flex: 1;
+      }
+
+      .cns-post-actions {
+        gap: 5px;
+      }
+
+      .cns-action-btn {
+        padding: 10px 6px;
+        font-size: 11px;
+      }
+
+      .cns-comment-form {
+        align-items: stretch;
+      }
+
+      .cns-comment-submit {
+        padding: 10px;
+      }
+
+      .cns-image-viewer {
+        padding: 10px;
+      }
+    }
+    
+    /* =========================================
+   FaithCircle — IMAGE VIEWER
+========================================= */
+
+.cns-image-viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    padding: 70px 60px 55px;
+
+    background: rgba(0, 0, 0, 0.96);
+}
+
+.cns-image-viewer.open {
+    display: flex;
+}
+
+.cns-viewer-toolbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    min-height: 58px;
+    padding: 12px 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    color: #fff;
+    background: rgba(10, 15, 25, 0.85);
+}
+
+.cns-viewer-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.cns-viewer-download {
+    color: #fff;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+
+    padding: 9px 13px;
+    border-radius: 8px;
+    background: #2563eb;
+}
+
+.cns-viewer-download:hover {
+    background: #1d4ed8;
+}
+
+.cns-viewer-close {
+    width: 40px;
+    height: 40px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #263244;
+    color: #fff;
+
+    font-size: 30px;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.cns-viewer-close:hover {
+    background: #dc2626;
+}
+
+#imageViewerImage {
+    display: block;
+
+    max-width: 100%;
+    max-height: 100%;
+
+    width: auto;
+    height: auto;
+
+    object-fit: contain;
+    border-radius: 5px;
+}
+
+.cns-viewer-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 44px;
+    height: 54px;
+
+    border: none;
+    border-radius: 10px;
+
+    color: #fff;
+    background: rgba(55, 65, 81, 0.85);
+
+    font-size: 23px;
+    cursor: pointer;
+
+    z-index: 2;
+}
+
+.cns-viewer-nav:hover {
+    background: #2563eb;
+}
+
+.cns-viewer-prev {
+    left: 12px;
+}
+
+.cns-viewer-next {
+    right: 12px;
+}
+
+.cns-viewer-nav:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.cns-viewer-hint {
+    position: absolute;
+    bottom: 8px;
+    left: 0;
+    right: 0;
+
+    margin: 0;
+    padding: 8px;
+
+    color: #d1d5db;
+    text-align: center;
+    font-size: 12px;
+}
+
+body.viewer-open {
+    overflow: hidden;
+}
+
+@media (max-width: 600px) {
+    .cns-image-viewer {
+        padding: 70px 8px 55px;
+    }
+
+    .cns-viewer-prev {
+        left: 4px;
+    }
+
+    .cns-viewer-next {
+        right: 4px;
+    }
+
+    .cns-viewer-nav {
+        width: 35px;
+        height: 45px;
+        font-size: 18px;
+    }
+
+    #imageViewerImage {
+        max-width: calc(100vw - 55px);
+    }
+
+    .cns-viewer-toolbar {
+        padding: 10px;
+    }
+}
+
+/* =========================================
+   COZMIC — GROUPS NAVIGATION
+========================================= */
+
+.groups-nav-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    padding: 10px 12px;
+    border-radius: 10px;
+
+    color: inherit;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+/* Groups icon */
+.groups-nav-link .nav-icon {
+    font-size: 17px;
+}
+
+/* Hover effect */
+.groups-nav-link:hover {
+    background-color: rgba(197, 157, 40, 0.14);
+    color: #c59d28;
+}
+
+/* Active page */
+.groups-nav-link.active {
+    background-color: rgba(197, 157, 40, 0.16);
+    color: #c59d28;
+    font-weight: 600;
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+    .groups-nav-link {
+        flex-shrink: 0;
+        padding: 9px 10px;
+    }
+}
+
+/* =========================================
+   COZMIC — CLICKABLE PROFILE LINKS
+========================================= */
+
+.cns-profile-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.cns-profile-link:hover .cns-profile-name {
+    color: #1769ff;
+    text-decoration: underline;
+}
+
+.cns-profile-link:focus-visible {
+    outline: 2px solid #1769ff;
+    outline-offset: 4px;
+    border-radius: 8px;
+}
+
+.cns-profile-name {
+    overflow-wrap: anywhere;
+    transition: color 0.2s ease;
+}
+
+.cns-profile-avatar-link {
+    display: inline-flex;
+    flex-shrink: 0;
+    border-radius: 50%;
+}
+
+.cns-profile-avatar-link:hover {
+    opacity: 0.85;
+}
+
+.cns-profile-avatar-link:focus-visible {
+    outline: 2px solid #1769ff;
+    outline-offset: 3px;
+}
+
+.cns-comment-author-link {
+    color: #1e293b;
+    text-decoration: none;
+    font-weight: 800;
+}
+
+.cns-comment-author-link:hover {
+    color: #1769ff;
+    text-decoration: underline;
+}
+  
+    .cns-comment-toggle { border: 0; background: transparent; color: #53627a; font-weight: 800; cursor: pointer; padding: 3px 0; }
+    .cns-post-actions .cns-action-btn { font-weight: 800; border: 0; }
+    .cns-reaction-picker { display:flex; flex-wrap:wrap; gap:5px; padding:8px; margin:4px 0 8px; background:#fff; border:1px solid #dce4ef; border-radius:999px; box-shadow:0 8px 24px #0b1f3a20; }
+    .cns-reaction-option { border:0; background:#f1f5f9; border-radius:50%; width:38px; height:38px; font-size:22px; transition:transform .12s; }
+    .cns-reaction-option:hover { transform:scale(1.15); }
+    .cns-post-actions { position:relative; }
+
+
+/* ================= FaithCircle visual refresh ================= */
+:root { --cns-navy:#0b2a52; --cns-blue:#1677ff; --cns-aqua:#39d9c4; --cns-bg:#f3f7fd; --cns-radius:15px; }
+body { background:#f3f7fd; color:#102b53; }
+.cns-topbar { background:linear-gradient(105deg,#08264d,#103c70); }
+.cns-topbar-inner { max-width:1600px; min-height:78px; padding:10px 24px; }
+.cns-brand { gap:12px; }
+.cns-brand-icon.faithcircle-mark { display:grid; place-items:center; width:58px; height:58px; border-radius:50%; background:linear-gradient(135deg,#1685ff,#0753cf); box-shadow:0 5px 18px #001b4c55; }
+.faithcircle-mark span { font-size:38px; line-height:1; color:white; font-weight:800; }
+.faithcircle-wordmark { font-size:27px!important; letter-spacing:-.7px; font-weight:800; color:#fff; }
+.faithcircle-wordmark span { color:#3c9bff; }
+.cns-nav-links { gap:5px; }
+.cns-nav-links a,.cns-nav-links button { border-radius:10px; padding:10px 11px; }
+.cns-nav-links a.active,.cns-nav-links a:hover,.cns-nav-links button:hover { background:#ffffff20; }
+.cns-layout { max-width:1600px; grid-template-columns:230px minmax(0,1fr) 290px; gap:18px; padding:20px 24px 36px; align-items:start; }
+.cns-card,.faith-widget { border:1px solid #e1eafa; border-radius:15px; box-shadow:0 4px 16px rgba(18,55,105,.045); }
+.cns-sidebar { position:sticky; top:96px; overflow:hidden; }
+.cns-sidebar-cover { height:62px; background:linear-gradient(130deg,#0878ef,#36d5cb); }
+.cns-sidebar-profile { padding:0 18px 16px; }
+.cns-sidebar-actions { display:grid; gap:7px; padding:0 16px 17px; }
+.cns-sidebar-actions a { border-radius:9px; text-align:left; padding:11px 12px; background:#edf5ff; color:#0b4389; }
+.cns-main { min-width:0; gap:14px; }
+.faithcircle-hero { min-height:166px; display:flex; justify-content:space-between; align-items:center; gap:20px; overflow:hidden; position:relative; padding:23px 28px; border-radius:16px; color:#fff; background:linear-gradient(105deg,rgba(5,28,59,.94),rgba(8,52,93,.48)),url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1500&q=85') center 52%/cover; box-shadow:0 5px 20px #0b2a521c; }
+.faithcircle-hero:after { content:'✝'; position:absolute; right:32%; bottom:-25px; font-size:145px; line-height:1; color:#fff; opacity:.24; pointer-events:none; }
+.faithcircle-hero-copy,.faithcircle-hero-verse { position:relative; z-index:1; }
+.faithcircle-eyebrow { margin:0 0 5px; text-transform:uppercase; letter-spacing:1.6px; font-size:10px; font-weight:800; color:#bfe8ff; }
+.faithcircle-hero h1 { margin:0; font-size:clamp(34px,4vw,52px); line-height:1.05; letter-spacing:-1.8px; }
+.faithcircle-hero-copy>p:last-child { margin:8px 0 0; font-size:15px; font-weight:700; }
+.faithcircle-hero-verse { max-width:240px; text-align:right; }
+.hero-cross { display:block; font-size:27px; margin-bottom:3px; }
+.faithcircle-hero blockquote { margin:0; font-size:14px; line-height:1.5; font-style:italic; }
+.faithcircle-hero cite { display:block; margin-top:6px; font-size:12px; font-style:normal; }
+.cns-composer { padding:18px; }
+.cns-section-heading { color:#102e5d; }
+.cns-textarea { border-radius:13px; background:#f2f6fc; border-color:transparent; }
+.cns-photo-label { border-radius:9px; }
+.cns-primary-btn { border-radius:9px; background:linear-gradient(110deg,#147aff,#0759d9); }
+.cns-feed-heading { margin:3px 0; }
+.cns-feed-heading h2 { color:#102e5d; }
+.cns-post { border-radius:15px; margin-bottom:14px; }
+.cns-post-author strong { color:#102e5d; }
+.cns-post-actions button { font-weight:700; }
+.faithcircle-right-rail { display:grid; gap:14px; min-width:0; }
+.faith-widget { padding:17px; background:#fff; }
+.faith-widget h2 { margin:0 0 13px; font-size:16px; color:#0b2f64; }
+.faith-verse { margin:0 0 10px; font-style:italic; line-height:1.6; color:#173d75; }
+.faith-widget>strong { font-size:12px; color:#1268e8; }
+.faith-widget>a { display:flex; justify-content:space-between; gap:10px; padding:11px 0; border-top:1px solid #edf2f9; font-size:13px; font-weight:700; color:#17447f; }
+.faith-widget>a span { color:#1677ff; font-size:20px; line-height:12px; }
+.faith-widget-blue { color:#fff; background:linear-gradient(135deg,#1267bf,#0a2b59); }
+.faith-widget-blue h2 { color:#fff; line-height:1.4; }
+.faith-widget-blue p { margin:0; color:#d6e9ff; font-size:12px; }
+.widget-cross { float:right; font-size:36px; color:#bce8ff; }
+@media (max-width:1200px) { .cns-layout { grid-template-columns:210px minmax(0,1fr); } .faithcircle-right-rail { grid-column:2; grid-template-columns:repeat(2,minmax(0,1fr)); } .faith-widget-blue { grid-column:1/-1; } }
+@media (max-width:850px) { .cns-topbar-inner { flex-wrap:wrap; } .cns-nav-links { order:2; width:100%; overflow-x:auto; justify-content:flex-start; } .cns-layout { display:flex; flex-direction:column; padding:12px; } .cns-sidebar { position:static; width:100%; } .cns-sidebar-profile { display:grid; grid-template-columns:56px 1fr; column-gap:12px; align-items:center; } .cns-sidebar-profile .cns-avatar { grid-row:span 3; } .cns-sidebar-bio,.cns-sidebar-location { display:none; } .cns-sidebar-actions { grid-template-columns:1fr 1fr; } .cns-main,.faithcircle-right-rail { width:100%; } .faithcircle-right-rail { grid-template-columns:1fr; } .faithcircle-hero { padding:20px; } .faithcircle-hero-verse { max-width:42%; } .faithcircle-hero:after { right:25%; } }
+@media (max-width:480px) { .cns-topbar-inner { padding:10px 12px; } .faithcircle-wordmark { font-size:23px!important; } .faithcircle-mark.faithcircle-mark { width:46px;height:46px; } .faithcircle-mark span { font-size:30px; } .faithcircle-hero { min-height:155px; padding:16px; } .faithcircle-hero h1 { font-size:32px; } .faithcircle-hero-copy>p:last-child { font-size:12px; } .faithcircle-hero-verse { max-width:45%; } .faithcircle-hero blockquote { font-size:11px; } .faithcircle-hero cite { font-size:10px; } }
+
+</style>
+</head>
+
+<body>
+
+  <!-- ==============================
+       TOP NAVIGATION
+  ============================== -->
+
+  <header class="cns-topbar">
+    <div class="cns-topbar-inner">
+
+      <a href="dashboard.html" class="cns-brand">
+        <div class="cns-brand-icon faithcircle-mark" aria-hidden="true"><span>✝</span></div>
+
+        <div class="cns-brand-name">
+          <span class="faithcircle-wordmark">Faith<span>Circle</span></span>
+        </div>
+      </a>
+<!-- FaithCircle MAIN NAVIGATION -->
+<nav class="cns-nav-links" aria-label="Main navigation">
+
+    <a href="dashboard.html" class="active" aria-current="page">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Home</span>
+    </a>
+
+    <a href="users.html">
+        <span class="nav-icon">🔎</span>
+        <span class="nav-label">Discover</span>
+    </a>
+
+    <a href="friends.html">
+        <span class="nav-icon">👥</span>
+        <span class="nav-label">Friends</span>
+    </a>
+           
+
+    <a href="notifications.html">
+        <span class="nav-icon">🔔</span>
+        <span class="nav-label">Notifications</span>
+    </a>
+
+    <a href="messages.html">
+        <span class="nav-icon">💬</span>
+        <span class="nav-label">Messages</span>
+    </a>
+    
+    
+<a href="groups.html" class="groups-nav-link">
+    <span class="nav-icon">👥</span>
+    <span class="nav-label">Groups</span>
+</a>
+
+    <a href="profile.html">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profile</span>
+    </a>
+
+    <button
+        type="button"
+        id="signOutButton"
+        class="logout-link"
+    >
+        <span class="nav-icon">🚪</span>
+        <span class="nav-label">Sign out</span>
+    </button>
+
+</nav>
+
+    </div>
+  </header>
+
+
+  <!-- ==============================
+       IMAGE VIEWER
+  ============================== -->
+
+  <!-- =========================================
+     FaithCircle — IMAGE VIEWER
+========================================= -->
+
+<div
+    id="imageViewer"
+    class="cns-image-viewer"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Expanded post image"
+>
+    <div class="cns-viewer-toolbar">
+        <span id="imageViewerCounter">1 / 1</span>
+
+        <div class="cns-viewer-actions">
+            <a
+                id="imageViewerDownload"
+                class="cns-viewer-download"
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                download
+            >
+                Download
+            </a>
+
+            <button
+                id="imageViewerClose"
+                class="cns-viewer-close"
+                type="button"
+                aria-label="Close image"
+            >&times;</button>
+        </div>
+    </div>
+
+    <button
+        id="imageViewerPrev"
+        class="cns-viewer-nav cns-viewer-prev"
+        type="button"
+        aria-label="Previous image"
+    >
+        &#10094;
+    </button>
+
+    <img
+        id="imageViewerImage"
+        src=""
+        alt="Expanded post image"
+    >
+
+    <button
+        id="imageViewerNext"
+        class="cns-viewer-nav cns-viewer-next"
+        type="button"
+        aria-label="Next image"
+    >
+        &#10095;
+    </button>
+
+    <p class="cns-viewer-hint">
+        Tap outside the image or press Escape to close.
+    </p>
+</div>
+
+
+  <!-- ==============================
+       MAIN LAYOUT
+  ============================== -->
+
+  <main class="cns-layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="cns-card cns-sidebar">
+
+      <div class="cns-sidebar-cover"></div>
+
+      <div class="cns-sidebar-profile">
+
+        <img
+          id="sidebarAvatar"
+          class="cns-avatar"
+          src=""
+          alt="Your profile picture"
+          hidden
+        >
+
+        <div id="sidebarAvatarFallback" class="cns-avatar">
+          C
+        </div>
+
+        <h2 id="sidebarName" class="cns-sidebar-name">
+          Loading profile...
+        </h2>
+
+        <p id="sidebarUsername" class="cns-sidebar-username">
+          @loading
+        </p>
+
+        <p id="sidebarBio" class="cns-sidebar-bio"></p>
+
+        <div id="sidebarLocation" class="cns-sidebar-location"></div>
+
+      </div>
+
+      <div class="cns-sidebar-actions">
+        <a href="profile.html">View my profile</a>
+        <a href="users.html">Discover people</a>
+      </div>
+
+    </aside>
+
+
+    <!-- MAIN FEED -->
+
+    <section class="cns-main">
+
+      
+      </div>
+
+
+      <!-- FAITHCIRCLE WELCOME BANNER -->
+      <section class="faithcircle-hero" aria-label="Welcome to FaithCircle">
+        <div class="faithcircle-hero-copy">
+          <p class="faithcircle-eyebrow">A community rooted in faith</p>
+          <h1>FaithCircle</h1>
+          <p>Connect. Encourage. Grow in Christ.</p>
+        </div>
+        <div class="faithcircle-hero-verse">
+          <span class="hero-cross" aria-hidden="true">✝</span>
+          <blockquote>“For where two or three are gathered in my name, there am I with them.”</blockquote>
+          <cite>Matthew 18:20</cite>
+        </div>
+      </section>
+
+      <!-- CREATE POST -->
+
+      <section class="cns-card cns-composer">
+
+        <h2 class="cns-section-heading">Share with your faith community</h2>
+
+        <div class="cns-composer-top">
+
+          <img
+            id="composerAvatar"
+            class="cns-small-avatar"
+            src=""
+            alt="Your avatar"
+            hidden
+          >
+
+          <div id="composerAvatarFallback" class="cns-small-avatar">
+            C
+          </div>
+
+          <div class="cns-composer-user">
+            <strong id="composerName">Loading...</strong>
+            <small>Share a testimony, Bible verse, prayer request, or encouragement</small>
+          </div>
+
+        </div>
+
+        <form id="postForm">
+
+          <textarea
+            id="postContent"
+            class="cns-textarea"
+            maxlength="5000"
+            placeholder="What is on your heart today?"
+            aria-label="Write your post"
+          ></textarea>
+
+          <span id="postCounter" class="cns-counter">
+            0 / 5000
+          </span>
+
+          <div id="imagePreview" class="cns-preview-grid"></div>
+          <div id="videoPreview" class="cns-video-preview" hidden></div>
+
+          <div class="cns-composer-actions">
+
+            <label class="cns-photo-label">
+
+              <span>🖼️ Photo / Video</span>
+
+              <input
+                type="file"
+                id="postImagesInput"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+              >
+
+            </label>
+
+            <label class="cns-photo-label">
+              <span>📖 Bible verse or video</span>
+              <input
+                type="file"
+                id="postVideoInput"
+                accept="video/mp4,video/webm,video/quicktime,video/ogg,video/*"
+              >
+            </label>
+
+            <button
+              type="submit"
+              id="publishButton"
+              class="cns-primary-btn"
+            >
+              Publish post
+            </button>
+
+          </div>
+
+          
+        </form>
+
+      </section>
+
+
+      <!-- FEED HEADING -->
+
+      <div class="cns-feed-heading">
+        <h2>News Feed</h2>
+
+        <button
+          type="button"
+          id="refreshFeedButton"
+          class="cns-refresh-btn"
+        >
+          Refresh
+        </button>
+      </div>
+
+
+      <div
+        id="feedStatus"
+        class="cns-card cns-feed-status"
+        aria-live="polite"
+      >
+        Loading posts...
+      </div>
+
+
+      <div id="feed"></div>
+
+    </section>
+
+    <aside class="faithcircle-right-rail" aria-label="Faith community resources">
+      <section class="faith-widget">
+        <h2>✝ Quick Bible Verse</h2>
+        <p class="faith-verse">“Trust in the Lord with all your heart and lean not on your own understanding.”</p>
+        <strong>Proverbs 3:5</strong>
+      </section>
+      <section class="faith-widget">
+        <h2>🙏 Grow in faith</h2>
+        <a href="groups.html">Explore Christian groups <span>›</span></a>
+        <a href="messages.html">Encourage a friend <span>›</span></a>
+        <a href="friends.html">Connect with believers <span>›</span></a>
+      </section>
+      <section class="faith-widget faith-widget-blue">
+        <span class="widget-cross" aria-hidden="true">✝</span>
+        <h2>With God, all things are possible.</h2>
+        <p>Matthew 19:26</p>
+      </section>
+    </aside>
+
+  </main>
+
+
+  <!-- ==============================
+       SUPABASE CONFIGURATION
+  ============================== -->
+
+  <script src="supabase-config.js"></script>
+  <script src="faithcircle-moderation.js"></script>
+  <script src="FaithCircle-live-enhancements.js" defer></script>
+
+
+  <!-- ==============================
+       DASHBOARD JAVASCRIPT
+  ============================== -->
+
+  <script>
+    "use strict";
+
+    // =========================================
+    // CONFIGURATION
+    // =========================================
+
+    const supabaseClient = window.supabaseClient;
+
+    const AVATAR_BUCKET = "avatars";
+    const POST_BUCKET = "post-images";
+    const VIDEO_BUCKET = "cozmic-videos";
+
+    const MAX_IMAGES = 5;
+    const MAX_VIDEO_SIZE = 500 * 1024 * 1024;
+    const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+    const MAX_POST_LENGTH = 5000;
+    const MAX_COMMENT_LENGTH = 2000;
+
+    // =========================================
+    // DOM ELEMENTS
+    // =========================================
+
+    const feed = document.getElementById("feed");
+    const feedStatus = document.getElementById("feedStatus");
+
+    const postForm = document.getElementById("postForm");
+    const postContent = document.getElementById("postContent");
+    const postImagesInput = document.getElementById("postImagesInput");
+    const postVideoInput = document.getElementById("postVideoInput");
+    const videoPreview = document.getElementById("videoPreview");
+    const imagePreview = document.getElementById("imagePreview");
+    const publishButton = document.getElementById("publishButton");
+    const postCounter = document.getElementById("postCounter");
+
+    const sidebarAvatar = document.getElementById("sidebarAvatar");
+    const sidebarAvatarFallback =
+      document.getElementById("sidebarAvatarFallback");
+
+    const composerAvatar = document.getElementById("composerAvatar");
+    const composerAvatarFallback =
+      document.getElementById("composerAvatarFallback");
+
+    const sidebarName = document.getElementById("sidebarName");
+    const sidebarUsername = document.getElementById("sidebarUsername");
+    const sidebarBio = document.getElementById("sidebarBio");
+    const sidebarLocation = document.getElementById("sidebarLocation");
+    const composerName = document.getElementById("composerName");
+
+    const imageViewer = document.getElementById("imageViewer");
+    const imageViewerImage = document.getElementById("imageViewerImage");
+    const imageViewerClose = document.getElementById("imageViewerClose");
+
+    // =========================================
+    // APPLICATION STATE
+    // =========================================
+
+    let currentUser = null;
+    let currentProfile = null;
+    let selectedImages = [];
+    let selectedVideo = null;
+    let loadingFeed = false;
+    let feedLoadRequested = false;
+
+    // =========================================
+    // SWEETALERT HELPERS
+    // =========================================
+
+    function showSuccess(message) {
+      if (window.Swal) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: message,
+          confirmButtonColor: "#1769ff"
+        });
+      } else {
+        alert(message);
+      }
+    }
+
+    function showError(message) {
+      if (window.Swal) {
+        Swal.fire({
+          icon: "error",
+          title: "Something went wrong",
+          text: message,
+          confirmButtonColor: "#1769ff"
+        });
+      } else {
+        alert(message);
+      }
+    }
+
+    function showInfo(message) {
+      if (window.Swal) {
+        Swal.fire({
+          icon: "info",
+          text: message,
+          confirmButtonColor: "#1769ff"
+        });
+      } else {
+        alert(message);
+      }
+    }
+
+    async function confirmAction(title, text, confirmText) {
+      if (!window.Swal) {
+        return confirm(text);
+      }
+
+      const result = await Swal.fire({
+        icon: "warning",
+        title,
+        text,
+        showCancelButton: true,
+        confirmButtonText: confirmText || "Continue",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#1769ff",
+        cancelButtonColor: "#64748b"
+      });
+
+      return result.isConfirmed;
+    }
+
+    // =========================================
+    // GENERAL HELPERS
+    // =========================================
+
+    function getInitials(name) {
+      const value = String(name || "CNS").trim();
+
+      if (!value) return "C";
+
+      return value
+        .split(/\s+/)
+        .slice(0, 2)
+        .map(part => part.charAt(0).toUpperCase())
+        .join("");
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(
+        /[&<>"']/g,
+        character => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;"
+        })[character]
+      );
+    }
+
+    function isValidMediaURL(value) {
+      if (typeof value !== "string" || !value.trim()) return false;
+      try {
+        const url = new URL(value, window.location.href);
+        return url.protocol === "https:" || url.protocol === "http:";
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function isValidImageURL(value) {
+      try {
+        const parsed = new URL(value, window.location.href);
+
+        return (
+          parsed.protocol === "https:" ||
+          parsed.origin === window.location.origin
+        );
+      } catch {
+        return false;
+      }
+    }
+
+    function formatDate(value) {
+      if (!value) return "";
+
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) {
+        return "";
+      }
+
+      return date.toLocaleString(undefined, {
+        dateStyle: "medium",
+        timeStyle: "short"
+      });
+    }
+
+    function formatCount(value) {
+      const count = Number(value) || 0;
+
+      return count.toLocaleString();
+    }
+
+    function displayName(profile) {
+      if (!profile) return "FaithCircle member";
+
+      return (
+        profile.full_name ||
+        profile.username ||
+        "FaithCircle member"
+      );
+    }
+
+// =========================================
+// COZMIC — PROFILE NAVIGATION HELPERS
+// =========================================
+
+function getProfileURL(profile) {
+    if (!profile || !profile.id) {
+        return "users.html";
+    }
+
+    return "profile.html?id=" +
+        encodeURIComponent(profile.id);
+}
+
+function createProfileLink(profile, className = "") {
+    const link = document.createElement("a");
+
+    link.href = getProfileURL(profile);
+    link.className = "cns-profile-link";
+
+    if (className) {
+        link.classList.add(className);
+    }
+
+    link.setAttribute(
+        "aria-label",
+        "View " + displayName(profile) + "'s profile"
+    );
+
+    return link;
+}
+
+function createProfileAvatarLink(profile, avatarElement) {
+    const link = document.createElement("a");
+
+    link.href = getProfileURL(profile);
+    link.className = "cns-profile-avatar-link";
+
+    link.setAttribute(
+        "aria-label",
+        "View " + displayName(profile) + "'s profile"
+    );
+
+    link.appendChild(avatarElement);
+
+    return link;
+}
+
+    function getPostURL(postId) {
+      const url = new URL(
+        "dashboard.html",
+        window.location.href
+      );
+
+      url.hash = "post-" + postId;
+
+      return url.href;
+    }
+
+    function setAvatar(imageElement, fallbackElement, url, name) {
+      fallbackElement.textContent = getInitials(name);
+
+      if (url && isValidImageURL(url)) {
+        imageElement.src = url;
+        imageElement.hidden = false;
+        fallbackElement.hidden = true;
+
+        imageElement.onerror = () => {
+          imageElement.hidden = true;
+          fallbackElement.hidden = false;
+        };
+      } else {
+        imageElement.removeAttribute("src");
+        imageElement.hidden = true;
+        fallbackElement.hidden = false;
+      }
+    }
+
+    function setBusy(button, busy, busyText, normalText) {
+      button.disabled = busy;
+
+      if (busy) {
+        button.dataset.originalText =
+          button.textContent.trim() || normalText;
+
+        button.textContent = busyText;
+      } else {
+        button.textContent =
+          normalText ||
+          button.dataset.originalText ||
+          "Submit";
+      }
+    }
+
+    function showFeedStatus(message) {
+      feedStatus.textContent = message;
+      feedStatus.hidden = false;
+    }
+
+    // =========================================
+    // IMAGE VIEWER
+    // =========================================
+
+    function openImageViewer(imageURL) {
+      if (!isValidImageURL(imageURL)) {
+        showError("This image URL is invalid.");
+        return;
+      }
+
+      imageViewerImage.src = imageURL;
+      imageViewer.classList.add("open");
+      document.body.classList.add("viewer-open");
+    }
+
+    function closeImageViewer() {
+      imageViewer.classList.remove("open");
+      imageViewerImage.removeAttribute("src");
+      document.body.classList.remove("viewer-open");
+    }
+
+    imageViewerClose.addEventListener(
+      "click",
+      closeImageViewer
+    );
+
+    imageViewer.addEventListener("click", event => {
+      if (event.target === imageViewer) {
+        closeImageViewer();
+      }
+    });
+
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        closeImageViewer();
+      }
+    });
+
+    // =========================================
+    // AUTHENTICATION
+    // =========================================
+
+    async function requireLogin() {
+      if (!supabaseClient) {
+        showFeedStatus(
+          "Supabase configuration could not be loaded. Check supabase-config.js."
+        );
+
+        throw new Error("Supabase client is unavailable.");
+      }
+
+      const {
+        data,
+        error
+      } = await supabaseClient.auth.getSession();
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data.session || !data.session.user) {
+        window.location.replace("login.html");
+
+        throw new Error("You must sign in first.");
+      }
+
+      currentUser = data.session.user;
+
+      return currentUser;
+    }
+
+    // =========================================
+    // LOAD CURRENT PROFILE
+    // =========================================
+
+    async function loadCurrentUser() {
+      const {
+        data,
+        error
+      } = await supabaseClient
+        .from("profiles")
+        .select(
+          "id, username, full_name, bio, avatar_url, location"
+        )
+        .eq("id", currentUser.id)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Profile loading error:", error);
+        throw error;
+      }
+
+      currentProfile = data || {
+        id: currentUser.id,
+        username: currentUser.email || "member",
+        full_name: currentUser.email || "FaithCircle member",
+        bio: "",
+        avatar_url: "",
+        location: ""
+      };
+
+      const name = displayName(currentProfile);
+
+      sidebarName.textContent = name;
+
+      sidebarUsername.textContent =
+        currentProfile.username
+          ? "@" + currentProfile.username
+          : currentUser.email || "";
+
+      sidebarBio.textContent = currentProfile.bio || "";
+
+      sidebarLocation.textContent =
+        currentProfile.location
+          ? "📍 " + currentProfile.location
+          : "";
+
+      composerName.textContent = name;
+
+      setAvatar(
+        sidebarAvatar,
+        sidebarAvatarFallback,
+        currentProfile.avatar_url,
+        name
+      );
+
+      setAvatar(
+        composerAvatar,
+        composerAvatarFallback,
+        currentProfile.avatar_url,
+        name
+      );
+    }
+
+    // =========================================
+    // SELECTED IMAGE PREVIEW
+    // =========================================
+
+    function renderImagePreview() {
+      imagePreview.replaceChildren();
+
+      selectedImages.forEach((file, index) => {
+        const wrapper = document.createElement("div");
+
+        wrapper.className = "cns-preview-item";
+
+        const image = document.createElement("img");
+
+        image.alt = "Selected image " + (index + 1);
+        image.src = URL.createObjectURL(file);
+
+        const removeButton = document.createElement("button");
+
+        removeButton.type = "button";
+        removeButton.className = "cns-preview-remove";
+        removeButton.textContent = "×";
+        removeButton.setAttribute(
+          "aria-label",
+          "Remove selected image"
+        );
+
+        removeButton.addEventListener("click", () => {
+          selectedImages.splice(index, 1);
+          syncFileInput();
+          renderImagePreview();
+        });
+
+        wrapper.append(image, removeButton);
+
+        imagePreview.appendChild(wrapper);
+      });
+    }
+
+    function syncFileInput() {
+      const transfer = new DataTransfer();
+
+      selectedImages.forEach(file => {
+        transfer.items.add(file);
+      });
+
+      postImagesInput.files = transfer.files;
+    }
+
+    postImagesInput.addEventListener("change", () => {
+      const files = Array.from(postImagesInput.files || []);
+
+      if (selectedImages.length + files.length > MAX_IMAGES) {
+        showError(
+          "You can upload a maximum of five images per post."
+        );
+
+        postImagesInput.value = "";
+        return;
+      }
+
+      for (const file of files) {
+        if (
+          ![
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+          ].includes(file.type)
+        ) {
+          showError(
+            "Only JPEG, PNG, and WebP images are supported."
+          );
+
+          postImagesInput.value = "";
+          return;
+        }
+
+        if (file.size > MAX_IMAGE_SIZE) {
+          showError(
+            file.name + " is larger than 5 MB."
+          );
+
+          postImagesInput.value = "";
+          return;
+        }
+      }
+
+      selectedImages = selectedImages.concat(files);
+
+      if (selectedImages.length && selectedVideo) {
+        selectedVideo = null;
+        if (postVideoInput) postVideoInput.value = "";
+        if (videoPreview) {
+          videoPreview.replaceChildren();
+          videoPreview.hidden = true;
+        }
+      }
+
+      syncFileInput();
+      renderImagePreview();
+    });
+
+    postContent.addEventListener("input", () => {
+      postCounter.textContent =
+        postContent.value.length + " / " + MAX_POST_LENGTH;
+    });
+
+    // =========================================
+    // STORAGE HELPERS
+    // =========================================
+
+    function makeImagePath(file) {
+      const extensionMap = {
+        "image/jpeg": "jpg",
+        "image/png": "png",
+        "image/webp": "webp"
+      };
+
+      const extension = extensionMap[file.type] || "jpg";
+
+      const uniquePart =
+        window.crypto &&
+        typeof window.crypto.randomUUID === "function"
+          ? window.crypto.randomUUID()
+          : Date.now() + "-" +
+            Math.random().toString(36).slice(2);
+
+      return (
+        currentUser.id +
+        "/" +
+        uniquePart +
+        "." +
+        extension
+      );
+    }
+
+    async function uploadPostImages(files, postId) {
+      const uploadedRows = [];
+      const uploadedPaths = [];
+
+      try {
+        for (let index = 0; index < files.length; index++) {
+          const file = files[index];
+          const path = makeImagePath(file);
+
+          const {
+            data,
+            error
+          } = await supabaseClient.storage
+            .from(POST_BUCKET)
+            .upload(path, file, {
+              cacheControl: "3600",
+              upsert: false,
+              contentType: file.type
+            });
+
+          if (error) {
+            throw error;
+          }
+
+          uploadedPaths.push(path);
+
+          const {
+            data: publicData
+          } = supabaseClient.storage
+            .from(POST_BUCKET)
+            .getPublicUrl(data.path);
+
+          const imageURL = publicData.publicUrl;
+
+          const {
+            data: imageRow,
+            error: imageError
+          } = await supabaseClient
+            .from("post_images")
+            .insert({
+              post_id: postId,
+              user_id: currentUser.id,
+              image_url: imageURL,
+              position: index
+            })
+            .select("id, image_url, position")
+            .single();
+
+          if (imageError) {
+            throw imageError;
+          }
+
+          uploadedRows.push(imageRow);
+        }
+
+        return uploadedRows;
+
+      } catch (error) {
+        if (uploadedPaths.length) {
+          const {
+            error: cleanupError
+          } = await supabaseClient.storage
+            .from(POST_BUCKET)
+            .remove(uploadedPaths);
+
+          if (cleanupError) {
+            console.error(
+              "Storage cleanup error:",
+              cleanupError
+            );
+          }
+        }
+
+        throw error;
+      }
+    }
+
+    async function uploadPostVideo(file, postId) {
+      if (!file || !currentUser) throw new Error("Choose a video and sign in first.");
+      if (!file.type.startsWith("video/")) throw new Error("Please choose a valid video file.");
+      if (file.size > MAX_VIDEO_SIZE) throw new Error("The video must be 500 MB or smaller.");
+
+      const safeName = file.name.toLowerCase()
+        .replace(/[^a-z0-9._-]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "video.mp4";
+      const path = `${currentUser.id}/${postId}-${Date.now()}-${safeName}`;
+      const { error: uploadError } = await supabaseClient.storage
+        .from(VIDEO_BUCKET)
+        .upload(path, file, {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: file.type || "video/mp4"
+        });
+      if (uploadError) throw uploadError;
+
+      const { data } = supabaseClient.storage.from(VIDEO_BUCKET).getPublicUrl(path);
+      if (!data || !data.publicUrl) throw new Error("Could not create a public video URL.");
+      return data.publicUrl;
+    }
+
+    if (postVideoInput) {
+      postVideoInput.addEventListener("change", () => {
+        const file = postVideoInput.files && postVideoInput.files[0];
+        selectedVideo = file || null;
+        if (selectedVideo && selectedImages.length) {
+          selectedImages = [];
+          postImagesInput.value = "";
+          imagePreview.replaceChildren();
+        }
+        if (selectedVideo && selectedVideo.size > MAX_VIDEO_SIZE) {
+          selectedVideo = null;
+          postVideoInput.value = "";
+          showError("The video must be 500 MB or smaller.");
+        }
+        if (videoPreview) {
+          videoPreview.replaceChildren();
+          videoPreview.hidden = !selectedVideo;
+          if (selectedVideo) {
+            const label = document.createElement("div");
+            label.textContent = `Selected video: ${selectedVideo.name}`;
+            const preview = document.createElement("video");
+            preview.controls = true;
+            preview.playsInline = true;
+            preview.preload = "metadata";
+            preview.src = URL.createObjectURL(selectedVideo);
+            videoPreview.append(label, preview);
+          }
+        }
+      });
+    }
+
+    // =========================================
+    // CREATE POST
+    // =========================================
+
+    postForm.addEventListener("submit", async event => {
+      event.preventDefault();
+
+      if (!currentUser) {
+        showError("Please sign in before creating a post.");
+        return;
+      }
+
+      const content = postContent.value.trim();
+
+      const moderation = window.FaithCircleModeration?.check(content);
+      if (moderation && !moderation.allowed) {
+        showError(moderation.reason);
+        return;
+      }
+
+      if (!content && selectedImages.length === 0 && !selectedVideo) {
+        showError(
+          "Write something, add a photo, or choose a video."
+        );
+
+        return;
+      }
+
+      if (content.length > MAX_POST_LENGTH) {
+        showError("Your post is too long.");
+        return;
+      }
+
+      setBusy(
+        publishButton,
+        true,
+        "Publishing...",
+        "Publish post"
+      );
+
+      let createdPostId = null;
+
+      try {
+        const {
+          data: post,
+          error: postError
+        } = await supabaseClient
+          .from("posts")
+          .insert({
+            user_id: currentUser.id,
+            content: content
+          })
+          .select("id")
+          .single();
+
+        if (postError) {
+          throw postError;
+        }
+
+        createdPostId = post.id;
+
+        if (selectedVideo) {
+          const videoUrl = await uploadPostVideo(selectedVideo, createdPostId);
+          const { error: mediaError } = await supabaseClient
+            .from("posts")
+            .update({ media_type: "video", video_url: videoUrl, media_url: videoUrl })
+            .eq("id", createdPostId);
+          if (mediaError) throw mediaError;
+        } else if (selectedImages.length) {
+          await uploadPostImages(
+            selectedImages,
+            createdPostId
+          );
+        }
+
+        postContent.value = "";
+        postCounter.textContent = "0 / " + MAX_POST_LENGTH;
+
+        selectedImages = [];
+        postImagesInput.value = "";
+        imagePreview.replaceChildren();
+        selectedVideo = null;
+        if (postVideoInput) postVideoInput.value = "";
+        if (videoPreview) { videoPreview.replaceChildren(); videoPreview.hidden = true; }
+
+        await loadFeed();
+
+        showSuccess("Your post has been published.");
+
+      } catch (error) {
+        console.error("Create post error:", error);
+
+        if (createdPostId) {
+          console.error(
+            "The post was created, but a later operation failed.",
+            createdPostId
+          );
+
+          showError(
+            "Your post was created, but some images or updates may have failed. Refresh the feed before trying again."
+          );
+        } else {
+          showError(
+            error.message ||
+            "Could not publish your post. Check your connection and permissions."
+          );
+        }
+
+      } finally {
+        setBusy(
+          publishButton,
+          false,
+          "Publishing...",
+          "Publish post"
+        );
+      }
+    });
+
+    // =========================================
+    // SHARE POST
+    // =========================================
+
+    async function sharePost(postId) {
+      const postURL = getPostURL(postId);
+
+      try {
+        if (navigator.share) {
+          await navigator.share({
+            title: "FaithCircle",
+            text: "View this post on FaithCircle.",
+            url: postURL
+          });
+
+          return;
+        }
+
+        if (
+          navigator.clipboard &&
+          window.isSecureContext
+        ) {
+          await navigator.clipboard.writeText(postURL);
+
+          showSuccess("Post link copied. You can share it now.");
+
+          return;
+        }
+
+        const temporaryInput =
+          document.createElement("textarea");
+
+        temporaryInput.value = postURL;
+        temporaryInput.style.position = "fixed";
+        temporaryInput.style.left = "-9999px";
+
+        document.body.appendChild(temporaryInput);
+
+        temporaryInput.focus();
+        temporaryInput.select();
+
+        const copied = document.execCommand("copy");
+
+        temporaryInput.remove();
+
+        if (!copied) {
+          throw new Error("Could not copy the post link.");
+        }
+
+        showSuccess("Post link copied. You can share it now.");
+
+      } catch (error) {
+        if (error.name === "AbortError") {
+          return;
+        }
+
+        console.error("Share error:", error);
+
+        showError(
+          "Could not share this post. Please try again."
+        );
+      }
+    }
+
+    // =========================================
+    // EDIT POST
+    // =========================================
+
+    async function editPost(post) {
+      if (post.user_id !== currentUser.id) {
+        showError("You can only edit your own posts.");
+        return;
+      }
+
+      if (!window.Swal) {
+        showError("The editing dialog could not be loaded.");
+        return;
+      }
+
+      const result = await Swal.fire({
+        title: "Edit your post",
+        input: "textarea",
+        inputValue: post.content || "",
+        inputPlaceholder: "Write your post...",
+        inputAttributes: {
+          maxlength: MAX_POST_LENGTH,
+          "aria-label": "Edit post content"
+        },
+        showCancelButton: true,
+        confirmButtonText: "Save changes",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#1769ff",
+        inputValidator: value => {
+          if (!String(value || "").trim()) {
+            return "Your post cannot be empty.";
+          }
+
+          if (String(value).length > MAX_POST_LENGTH) {
+            return "Your post is too long.";
+          }
+        }
+      });
+
+      if (!result.isConfirmed) {
+        return;
+      }
+
+      const newContent = String(result.value || "").trim();
+
+      if (newContent === String(post.content || "")) {
+        return;
+      }
+
+      try {
+        const {
+          data,
+          error
+        } = await supabaseClient
+          .from("posts")
+          .update({
+            content: newContent
+          })
+          .eq("id", post.id)
+          .eq("user_id", currentUser.id)
+          .select("id")
+          .maybeSingle();
+
+        if (error) {
+          throw error;
+        }
+
+        if (!data) {
+          throw new Error(
+            "The post was not updated. Check your post ownership and Supabase UPDATE policy."
+          );
+        }
+
+        await loadFeed();
+
+        showSuccess("Your post has been updated.");
+
+      } catch (error) {
+        console.error("Edit post error:", error);
+
+        showError(
+          error.message ||
+          "Could not update your post."
+        );
+      }
+    }
+
+    // =========================================
+    // DELETE POST
+    // =========================================
+
+    async function deletePost(post) {
+      if (post.user_id !== currentUser.id) {
+        showError("You can only delete your own posts.");
+        return;
+      }
+
+      const confirmed = await confirmAction(
+        "Delete this post?",
+        "This action cannot be undone.",
+        "Delete post"
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        /*
+          First retrieve the image URLs.
+
+          The database's existing foreign-key rules determine
+          whether related image, comment, and like rows cascade.
+        */
+
+        const {
+          data: images,
+          error: imagesError
+        } = await supabaseClient
+          .from("post_images")
+          .select("id, image_url")
+          .eq("post_id", post.id);
+
+        if (imagesError) {
+          throw imagesError;
+        }
+
+        const {
+          data: deletedPost,
+          error: deleteError
+        } = await supabaseClient
+          .from("posts")
+          .delete()
+          .eq("id", post.id)
+          .eq("user_id", currentUser.id)
+          .select("id")
+          .maybeSingle();
+
+        if (deleteError) {
+          throw deleteError;
+        }
+
+        if (!deletedPost) {
+          throw new Error(
+            "The post was not deleted. Check your Supabase DELETE policy."
+          );
+        }
+
+        /*
+          The post is deleted successfully.
+
+          Storage cleanup is best-effort. It must not cause
+          the UI to report that the database deletion failed.
+        */
+
+        const storagePaths = [];
+
+        for (const image of images || []) {
+          try {
+            const url = new URL(image.image_url);
+
+            const marker = "/storage/v1/object/public/" +
+              POST_BUCKET + "/";
+
+            const markerIndex = url.pathname.indexOf(marker);
+
+            if (markerIndex !== -1) {
+              storagePaths.push(
+                decodeURIComponent(
+                  url.pathname.slice(markerIndex + marker.length)
+                )
+              );
+            }
+          } catch (error) {
+            console.warn(
+              "Could not derive a storage path:",
+              error
+            );
+          }
+        }
+
+        if (storagePaths.length) {
+          const {
+            error: storageError
+          } = await supabaseClient.storage
+            .from(POST_BUCKET)
+            .remove(storagePaths);
+
+          if (storageError) {
+            console.warn(
+              "The post was deleted, but storage cleanup failed:",
+              storageError
+            );
+          }
+        }
+
+        await loadFeed();
+
+        showSuccess("Your post has been deleted.");
+
+      } catch (error) {
+        console.error("Delete post error:", error);
+
+        showError(
+          error.message ||
+          "Could not delete this post. Check your Supabase permissions."
+        );
+      }
+    }
+
+    // =========================================
+    // LIKE / UNLIKE POST
+    // =========================================
+
+    async function toggleLike(postId, reaction = "like") {
+      try {
+        const {
+          data: existingLike,
+          error: findError
+        } = await supabaseClient
+          .from("post_likes")
+          .select("id, reaction")
+          .eq("post_id", postId)
+          .eq("user_id", currentUser.id)
+          .maybeSingle();
+
+        if (findError) {
+          throw findError;
+        }
+
+        if (existingLike && (existingLike.reaction || "like") === reaction) {
+          const { error } = await supabaseClient
+            .from("post_likes")
+            .delete()
+            .eq("id", existingLike.id)
+            .eq("user_id", currentUser.id);
+          if (error) throw error;
+        } else if (existingLike) {
+          const { error } = await supabaseClient
+            .from("post_likes")
+            .update({ reaction })
+            .eq("id", existingLike.id)
+            .eq("user_id", currentUser.id);
+          if (error) throw error;
+        } else {
+          const { error } = await supabaseClient
+            .from("post_likes")
+            .insert({ post_id: postId, user_id: currentUser.id, reaction });
+          if (error) throw error;
+        }
+        await loadFeed();
+
+      } catch (error) {
+        console.error("Like error:", error);
+
+        showError(
+          error.message ||
+          "Could not update your like. Check your Supabase policies."
+        );
+      }
+    }
+
+    // =========================================
+    // ADD COMMENT
+    // =========================================
+
+    async function addComment(postId, input, button) {
+      const content = input.value.trim();
+
+      if (!content) {
+        showInfo("Please write a comment first.");
+        return;
+      }
+
+      if (content.length > MAX_COMMENT_LENGTH) {
+        showError("Your comment is too long.");
+        return;
+      }
+
+      const moderation = window.FaithCircleModeration?.check(content);
+      if (moderation && !moderation.allowed) {
+        showError(moderation.reason);
+        return;
+      }
+
+      setBusy(button, true, "Sending...", "Comment");
+
+      try {
+        const {
+          error
+        } = await supabaseClient
+          .from("post_comments")
+          .insert({
+            post_id: postId,
+            user_id: currentUser.id,
+            content: content
+          });
+
+        if (error) {
+          throw error;
+        }
+
+        input.value = "";
+
+        await loadFeed();
+
+      } catch (error) {
+        console.error("Add comment error:", error);
+
+        showError(
+          error.message ||
+          "Could not add your comment."
+        );
+
+      } finally {
+        setBusy(button, false, "Sending...", "Comment");
+      }
+    }
+
+    // =========================================
+    // DELETE COMMENT
+    // =========================================
+
+    async function deleteComment(commentId) {
+      const confirmed = await confirmAction(
+        "Delete this comment?",
+        "This comment will be removed.",
+        "Delete comment"
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        const {
+          data,
+          error
+        } = await supabaseClient
+          .from("post_comments")
+          .delete()
+          .eq("id", commentId)
+          .eq("user_id", currentUser.id)
+          .select("id")
+          .maybeSingle();
+
+        if (error) {
+          throw error;
+        }
+
+        if (!data) {
+          throw new Error(
+            "The comment was not deleted. Check your Supabase DELETE policy."
+          );
+        }
+
+        await loadFeed();
+
+      } catch (error) {
+        console.error("Delete comment error:", error);
+
+        showError(
+          error.message ||
+          "Could not delete this comment."
+        );
+      }
+    }
+
+    // =========================================
+    // LOAD FEED DATA
+    // =========================================
+
+    async function loadFeed() {
+      if (loadingFeed) {
+        feedLoadRequested = true;
+        return;
+      }
+
+      loadingFeed = true;
+      feedLoadRequested = false;
+
+      feed.replaceChildren();
+
+      showFeedStatus("Loading posts...");
+
+      try {
+        const {
+          data: posts,
+          error: postsError
+        } = await supabaseClient
+          .from("posts")
+          .select(`
+            id,
+            user_id,
+            content,
+            created_at,
+            media_type,
+            video_url,
+            media_url,
+            profiles (
+              id,
+              username,
+              full_name,
+              avatar_url
+            ),
+            post_images (
+              id,
+              image_url,
+              position
+            )
+          `)
+          .order("created_at", {
+            ascending: false
+          })
+          .limit(50);
+
+        if (postsError) {
+          throw postsError;
+        }
+
+        if (!posts || posts.length === 0) {
+          showFeedStatus(
+            "No posts yet. Be the first to share something!"
+          );
+
+          return;
+        }
+
+        const postIds = posts.map(post => post.id);
+
+        const [
+          likesResult,
+          commentsResult
+        ] = await Promise.all([
+          supabaseClient
+            .from("post_likes")
+            .select("id, post_id, user_id")
+            .in("post_id", postIds),
+
+          supabaseClient
+            .from("post_comments")
+            .select(`
+              id,
+              post_id,
+              user_id,
+              content,
+              created_at,
+              profiles (
+                id,
+                username,
+                full_name,
+                avatar_url
+              )
+            `)
+            .in("post_id", postIds)
+            .order("created_at", {
+              ascending: true
+            })
+        ]);
+
+        if (likesResult.error) {
+          throw likesResult.error;
+        }
+
+        if (commentsResult.error) {
+          throw commentsResult.error;
+        }
+
+        const likes = likesResult.data || [];
+        const comments = commentsResult.data || [];
+
+        const likesByPost = new Map();
+        const commentsByPost = new Map();
+
+        for (const like of likes) {
+          if (!likesByPost.has(like.post_id)) {
+            likesByPost.set(like.post_id, []);
+          }
+
+          likesByPost.get(like.post_id).push(like);
+        }
+
+        for (const comment of comments) {
+          if (!commentsByPost.has(comment.post_id)) {
+            commentsByPost.set(comment.post_id, []);
+          }
+
+          commentsByPost.get(comment.post_id).push(comment);
+        }
+
+        feed.replaceChildren();
+
+        for (const post of posts) {
+          const postLikes = likesByPost.get(post.id) || [];
+          const postComments =
+            commentsByPost.get(post.id) || [];
+
+          renderPost(
+            post,
+            postLikes,
+            postComments
+          );
+        }
+
+        feedStatus.hidden = true;
+
+        /*
+          If the URL contains #post-ID, try to scroll to that post.
+        */
+
+        requestAnimationFrame(() => {
+          const hash = window.location.hash;
+
+          if (hash.startsWith("#post-")) {
+            const targetId = hash.slice(6);
+
+            const target = document.getElementById(
+              "post-" + targetId
+            );
+
+            if (target) {
+              target.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+              });
+            }
+          }
+        });
+
+      } catch (error) {
+        console.error("Feed loading error:", error);
+
+        feed.replaceChildren();
+
+        showFeedStatus(
+          error.message ||
+          "Could not load the News Feed. Please refresh the page."
+        );
+
+      } finally {
+        loadingFeed = false;
+
+        if (feedLoadRequested) {
+          feedLoadRequested = false;
+
+          queueMicrotask(() => {
+            loadFeed();
+          });
+        }
+      }
+    }
+
+    // =========================================
+    // RENDER ONE POST
+    // =========================================
+
+    function renderPost(post, likes, comments) {
+      const profile = Array.isArray(post.profiles)
+        ? post.profiles[0]
+        : post.profiles;
+
+      const isOwner = post.user_id === currentUser.id;
+
+      const myReaction = likes.find(like => like.user_id === currentUser.id);
+      const isLiked = Boolean(myReaction);
+      const reactionMap = { like: "👍 Like", love: "❤️ Love", care: "🤗 Care", laugh: "😂 Laugh", wow: "😮 Wow", sad: "😢 Sad", angry: "😡 Angry", dislike: "👎 Dislike" };
+
+      const card = document.createElement("article");
+
+      card.className = "cns-card cns-post";
+      card.id = "post-" + post.id;
+
+      const header = document.createElement("div");
+
+      header.className = "cns-post-header";
+
+      const avatar = document.createElement("img");
+
+      avatar.className = "cns-post-avatar";
+      avatar.alt = "Author avatar";
+
+      const avatarFallback = document.createElement("div");
+
+      avatarFallback.className = "cns-post-avatar";
+      avatarFallback.textContent = getInitials(
+        displayName(profile)
+      );
+
+      if (
+        profile &&
+        profile.avatar_url &&
+        isValidImageURL(profile.avatar_url)
+      ) {
+        avatar.src = profile.avatar_url;
+
+        avatar.onerror = () => {
+          avatar.remove();
+        };
+      } else {
+        avatar.hidden = true;
+      }
+
+      // =========================================
+// CLICKABLE POST AUTHOR PROFILE
+// =========================================
+
+const author = document.createElement("div");
+
+author.className = "cns-post-author";
+
+const authorName = document.createElement("strong");
+
+authorName.className = "cns-profile-name";
+authorName.textContent = displayName(profile);
+
+const postDate = document.createElement("small");
+
+postDate.textContent = formatDate(post.created_at);
+
+// Make the author's name clickable.
+const authorProfileLink = createProfileLink(
+    profile,
+    "cns-post-author-link"
+);
+
+authorProfileLink.appendChild(authorName);
+
+// Keep the date outside the profile link.
+author.append(
+    authorProfileLink,
+    postDate
+);
+
+// Make the author's picture clickable, too.
+if (profile && profile.id) {
+    const avatarLink = createProfileAvatarLink(
+        profile,
+        avatar
+    );
+
+    header.append(
+        avatarLink,
+        author
+    );
+} else {
+    header.append(
+        avatar,
+        author
+    );
+}
+      const content = document.createElement("div");
+
+      content.className = "cns-post-content";
+      content.textContent = post.content || "";
+
+      card.append(header);
+
+      if (post.content) {
+        card.append(content);
+      }
+
+      // VIDEO POSTS: videos render inline in the same News Feed.
+      const videoURL = post.video_url ||
+        (post.media_type === "video" ? post.media_url : "") || "";
+      if (videoURL && isValidMediaURL(videoURL)) {
+        const video = document.createElement("video");
+        video.className = "cns-post-video";
+        video.controls = true;
+        video.playsInline = true;
+        video.preload = "metadata";
+        video.src = videoURL;
+        video.setAttribute("aria-label", "Video post by " + displayName(profile));
+        card.append(video);
+      }
+
+      // POST IMAGES
+
+      const images = (post.post_images || [])
+        .slice()
+        .sort((a, b) => {
+          return (a.position || 0) - (b.position || 0);
+        });
+
+      if (images.length) {
+        const imageGrid = document.createElement("div");
+
+        imageGrid.className = "cns-post-images";
+
+        if (images.length === 1) {
+          imageGrid.classList.add("single-image");
+        }
+
+        for (const image of images) {
+          if (!isValidImageURL(image.image_url)) {
+            continue;
+          }
+
+          const img = document.createElement("img");
+
+          img.className = "cns-post-image";
+          img.src = image.image_url;
+          img.alt = "Post image";
+          img.loading = "lazy";
+          img.tabIndex = 0;
+          img.setAttribute("role", "button");
+          img.setAttribute("aria-label", "View image larger");
+
+          img.addEventListener("click", () => {
+            openImageViewer(image.image_url);
+          });
+
+          img.addEventListener("keydown", event => {
+            if (
+              event.key === "Enter" ||
+              event.key === " "
+            ) {
+              event.preventDefault();
+
+              openImageViewer(image.image_url);
+            }
+          });
+
+          imageGrid.appendChild(img);
+        }
+
+        if (imageGrid.children.length) {
+          card.append(imageGrid);
+        }
+      }
+
+      // POST STATISTICS
+
+      const stats = document.createElement("div");
+
+      stats.className = "cns-post-stats";
+
+      const likesCount = document.createElement("span");
+
+      const reactionTotals = likes.reduce((totals, item) => {
+        const key = item.reaction || "like";
+        totals[key] = (totals[key] || 0) + 1;
+        return totals;
+      }, {});
+      const reactionEmoji = {like:"👍",love:"❤️",care:"🤗",laugh:"😂",wow:"😮",sad:"😢",angry:"😡",dislike:"👎"};
+      const reactionSummary = Object.entries(reactionTotals)
+        .map(([key, count]) => `${reactionEmoji[key] || "👍"} ${formatCount(count)}`)
+        .join("  ");
+      likesCount.textContent = reactionSummary || "👍 0";
+
+      const commentsCount = document.createElement("button");
+      commentsCount.type = "button";
+      commentsCount.className = "cns-comment-toggle";
+      commentsCount.textContent = "💬 " + formatCount(comments.length) + " comments";
+      commentsCount.setAttribute("aria-expanded", "false");
+      stats.append(likesCount, commentsCount);
+
+      card.append(stats);
+
+      // POST ACTIONS
+
+      const actions = document.createElement("div");
+
+      actions.className = "cns-post-actions";
+
+      const likeButton = document.createElement("button");
+
+      likeButton.type = "button";
+
+      likeButton.className =
+        "cns-action-btn" + (isLiked ? " liked" : "");
+
+      likeButton.textContent = isLiked
+        ? (reactionMap[myReaction.reaction || "like"] || "👍 Like")
+        : "👍 Like";
+      likeButton.setAttribute("aria-label", "React to this post. Long press for more reactions.");
+      let pressTimer = null;
+      let pickerShown = false;
+      const showReactionPicker = () => {
+        if (pickerShown) return;
+        pickerShown = true;
+        let picker = card.querySelector(".cns-reaction-picker");
+        if (!picker) {
+          picker = document.createElement("div");
+          picker.className = "cns-reaction-picker";
+          picker.setAttribute("role", "group");
+          picker.setAttribute("aria-label", "Choose a reaction");
+          Object.entries({like:"👍",love:"❤️",care:"🤗",laugh:"😂",wow:"😮",sad:"😢",angry:"😡",dislike:"👎"}).forEach(([key, emoji]) => {
+            const b = document.createElement("button");
+            b.type = "button"; b.className = "cns-reaction-option";
+            b.textContent = emoji; b.title = key[0].toUpperCase()+key.slice(1);
+            b.setAttribute("aria-label", key);
+            b.addEventListener("click", () => { picker.remove(); toggleLike(post.id, key); });
+            picker.appendChild(b);
+          });
+          actions.insertBefore(picker, likeButton.nextSibling);
+        }
+        picker.hidden = false;
+      };
+      likeButton.addEventListener("pointerdown", () => {
+        pickerShown = false;
+        pressTimer = setTimeout(showReactionPicker, 500);
+      });
+      ["pointerup", "pointerleave", "pointercancel"].forEach(type => likeButton.addEventListener(type, () => clearTimeout(pressTimer)));
+      likeButton.addEventListener("contextmenu", event => { event.preventDefault(); showReactionPicker(); });
+      likeButton.addEventListener("click", () => {
+        if (pickerShown) { pickerShown = false; return; }
+        toggleLike(post.id, "like");
+      });
+
+      const shareButton = document.createElement("button");
+
+      shareButton.type = "button";
+      shareButton.className = "cns-action-btn share";
+      shareButton.textContent = "↗ Share";
+
+      shareButton.addEventListener("click", () => {
+        sharePost(post.id);
+      });
+
+      actions.append(likeButton, shareButton);
+
+      if (isOwner) {
+        const editButton = document.createElement("button");
+
+        editButton.type = "button";
+        editButton.className = "cns-action-btn edit";
+        editButton.textContent = "✎ Edit";
+
+        editButton.addEventListener("click", () => {
+          editPost(post);
+        });
+
+        const deleteButton = document.createElement("button");
+
+        deleteButton.type = "button";
+        deleteButton.className = "cns-action-btn delete";
+        deleteButton.textContent = "Delete";
+
+        deleteButton.addEventListener("click", () => {
+          deletePost(post);
+        });
+
+        actions.append(editButton, deleteButton);
+      }
+
+      card.append(actions);
+
+      // COMMENTS
+
+      const commentsSection = document.createElement("section");
+
+      commentsSection.className = "cns-comments";
+      commentsSection.hidden = true;
+      commentsCount.addEventListener("click", () => {
+        commentsSection.hidden = !commentsSection.hidden;
+        commentsCount.setAttribute("aria-expanded", String(!commentsSection.hidden));
+      });
+
+      const commentsHeading = document.createElement("h3");
+
+      commentsHeading.className = "cns-comments-heading";
+      commentsHeading.textContent = "Comments";
+
+      commentsSection.append(commentsHeading);
+
+      if (comments.length === 0) {
+        const emptyComments = document.createElement("p");
+
+        emptyComments.style.cssText =
+          "color:#64748b;font-size:12px;margin:0 0 10px";
+
+        emptyComments.textContent = "No comments yet.";
+
+        commentsSection.append(emptyComments);
+      }
+
+      for (const comment of comments) {
+        const commentProfile = Array.isArray(comment.profiles)
+          ? comment.profiles[0]
+          : comment.profiles;
+
+        const commentBox = document.createElement("div");
+
+        commentBox.className = "cns-comment";
+
+        const commentTop = document.createElement("div");
+
+        commentTop.className = "cns-comment-top";
+
+        // =========================================
+// CLICKABLE COMMENTER PROFILE
+// =========================================
+
+const commentAuthor = document.createElement("span");
+
+commentAuthor.className = "cns-comment-author";
+
+const commentName = document.createElement("a");
+
+commentName.className = "cns-comment-author-link";
+commentName.href = getProfileURL(commentProfile);
+commentName.textContent = displayName(commentProfile);
+
+commentName.setAttribute(
+    "aria-label",
+    "View " + displayName(commentProfile) + "'s profile"
+);
+
+const commentDate = document.createElement("span");
+
+commentDate.textContent =
+    " · " + formatDate(comment.created_at);
+
+commentAuthor.append(
+    commentName,
+    commentDate
+);
+
+commentTop.appendChild(commentAuthor);
+
+        if (comment.user_id === currentUser.id) {
+          const deleteCommentButton =
+            document.createElement("button");
+
+          deleteCommentButton.type = "button";
+
+          deleteCommentButton.className =
+            "cns-delete-comment";
+
+          deleteCommentButton.textContent = "Delete";
+
+          deleteCommentButton.addEventListener("click", () => {
+            deleteComment(comment.id);
+          });
+
+          commentTop.append(deleteCommentButton);
+        }
+
+        const commentText = document.createElement("div");
+
+        commentText.className = "cns-comment-text";
+        commentText.textContent = comment.content || "";
+
+        commentBox.append(commentTop, commentText);
+
+        commentsSection.append(commentBox);
+      }
+
+      // COMMENT FORM
+
+      const commentForm = document.createElement("form");
+
+      commentForm.className = "cns-comment-form";
+
+      const commentInput = document.createElement("input");
+
+      commentInput.type = "text";
+      commentInput.className = "cns-comment-input";
+      commentInput.maxLength = MAX_COMMENT_LENGTH;
+      commentInput.placeholder = "Write a comment...";
+      commentInput.setAttribute(
+        "aria-label",
+        "Write a comment"
+      );
+
+      const commentButton = document.createElement("button");
+
+      commentButton.type = "submit";
+      commentButton.className = "cns-comment-submit";
+      commentButton.textContent = "Comment";
+
+      commentForm.append(commentInput, commentButton);
+
+      commentForm.addEventListener("submit", event => {
+        event.preventDefault();
+
+        addComment(
+          post.id,
+          commentInput,
+          commentButton
+        );
+      });
+
+      commentsSection.append(commentForm);
+
+      card.append(commentsSection);
+
+      feed.appendChild(card);
+    }
+
+    // =========================================
+    // REFRESH FEED
+    // =========================================
+
+    document
+      .getElementById("refreshFeedButton")
+      .addEventListener("click", async event => {
+        const button = event.currentTarget;
+
+        button.disabled = true;
+        button.textContent = "Refreshing...";
+
+        try {
+          await loadFeed();
+        } finally {
+          button.disabled = false;
+          button.textContent = "Refresh";
+        }
+      });
+
+    // =========================================
+    // SIGN OUT
+    // =========================================
+
+    document
+      .getElementById("signOutButton")
+      .addEventListener("click", async () => {
+        const confirmed = await confirmAction(
+          "Sign out?",
+          "You will need to sign in again to access your account.",
+          "Sign out"
+        );
+
+        if (!confirmed) {
+          return;
+        }
+
+        try {
+          const {
+            error
+          } = await supabaseClient.auth.signOut();
+
+          if (error) {
+            throw error;
+          }
+
+          window.location.replace("login.html");
+
+        } catch (error) {
+          console.error("Sign-out error:", error);
+
+          showError(
+            error.message ||
+            "Could not sign out."
+          );
+        }
+      });
+
+    // =========================================
+    // INITIALIZE DASHBOARD
+    // =========================================
+
+    async function initializeDashboard() {
+      try {
+        await requireLogin();
+
+        await loadCurrentUser();
+
+        await loadFeed();
+
+      } catch (error) {
+        console.error(
+          "Dashboard initialization error:",
+          error
+        );
+
+        if (
+          error.message !== "You must sign in first." &&
+          error.message !== "Supabase client is unavailable."
+        ) {
+          showFeedStatus(
+            error.message ||
+            "Could not initialize the dashboard."
+          );
+        }
+      }
+    }
+
+    initializeDashboard();
+    
+    // ============================================
+// FaithCircle — REAL-TIME NEWS FEED
+// ============================================
+
+let newsFeedSubscription = null;
+
+function startNewsFeedRealtime() {
+    if (!window.supabaseClient) {
+        console.error("Supabase client is not available.");
+        return;
+    }
+
+    // Prevent duplicate subscriptions.
+    if (newsFeedSubscription) {
+        return;
+    }
+
+    newsFeedSubscription = window.supabaseClient
+        .channel("cns-connect-news-feed")
+
+        // Listen for new posts and post updates.
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "posts"
+            },
+            (payload) => {
+                console.log("News feed post changed:", payload);
+
+                refreshNewsFeed();
+            }
+        )
+
+        // Listen for new likes and unlikes.
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "post_likes"
+            },
+            (payload) => {
+                console.log("Post likes changed:", payload);
+
+                refreshNewsFeed();
+            }
+        )
+
+        // Listen for new comments, edits, and deletions.
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "post_comments"
+            },
+            (payload) => {
+                console.log("Post comments changed:", payload);
+
+                refreshNewsFeed();
+            }
+        )
+
+        .subscribe((status) => {
+            console.log(
+                "FaithCircle Realtime status:",
+                status
+            );
+        });
+}
+
+
+
+// =========================================
+// COZMIC — REALTIME FEED REFRESH
+// =========================================
+
+let newsFeedRefreshTimer = null;
+
+function refreshNewsFeed() {
+    clearTimeout(newsFeedRefreshTimer);
+
+    newsFeedRefreshTimer = setTimeout(() => {
+        if (typeof loadFeed === "function") {
+            loadFeed().catch((error) => {
+                console.error("News feed refresh failed:", error);
+            });
+        }
+    }, 400);
+}
+
+// Start the Realtime connection.
+startNewsFeedRealtime();
+
+
+// Clean up the connection when leaving the page.
+window.addEventListener("pagehide", () => {
+    if (newsFeedSubscription && window.supabaseClient) {
+        window.supabaseClient.removeChannel(
+            newsFeedSubscription
+        );
+
+        newsFeedSubscription = null;
+    }
+});
+
+  </script>
+
+</body>
+</html>

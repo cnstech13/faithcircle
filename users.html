@@ -1,0 +1,1745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b1f3a">
+
+  <title>Discover Users | FaithCircle</title>
+
+  <link rel="stylesheet" href="global.css">
+
+  <script src="faithcircle-moderation.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="supabase-config.js"></script>
+  <script src="FaithCircle-live-enhancements.js" defer></script>
+
+  <style>
+    :root {
+      --primary: #0b1f3a;
+      --accent: #1769ff;
+      --aqua: #35e0d0;
+      --background: #f3f6fa;
+      --card: #ffffff;
+      --text: #17202a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--background);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      text-decoration: none;
+    }
+
+    /* =====================================
+       PAGE LAYOUT
+    ===================================== */
+
+    .page {
+      max-width: 1150px;
+      margin: 30px auto;
+      padding: 0 16px 40px;
+    }
+
+    .page-heading {
+      margin-bottom: 22px;
+    }
+
+    .page-heading h1 {
+      margin: 0 0 8px;
+      color: #0b1f3a;
+      font-size: 29px;
+      letter-spacing: -0.5px;
+    }
+
+    .page-heading p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* =====================================
+       SEARCH
+    ===================================== */
+
+    .search-box {
+      display: flex;
+      gap: 10px;
+      margin: 24px 0;
+      padding: 12px;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      box-shadow: 0 4px 18px rgba(11, 31, 58, 0.04);
+    }
+
+    .search-box input {
+      flex: 1;
+      min-width: 0;
+      padding: 13px 14px;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      background: #f8fafc;
+      outline: none;
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(23, 105, 255, 0.1);
+    }
+
+    /* =====================================
+       BUTTONS
+    ===================================== */
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+
+      border: 0;
+      border-radius: 9px;
+      padding: 11px 15px;
+
+      font-weight: 700;
+      font-size: 13px;
+      text-align: center;
+
+      transition:
+        transform 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #1769ff, #4388ff);
+      color: white;
+      box-shadow: 0 4px 12px rgba(23, 105, 255, 0.18);
+    }
+
+    .btn-dark {
+      background: #0b1f3a;
+      color: white;
+    }
+
+    .btn-light {
+      background: #eaf2ff;
+      color: #1769ff;
+      border: 1px solid #cfe0ff;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+/* =========================================
+   FaithCircle — DISCOVER USERS FIX
+========================================= */
+
+#usersGrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    align-items: start;
+    width: 100%;
+    max-width: 1400px;
+    margin: 25px auto;
+    padding: 0 16px;
+    box-sizing: border-box;
+}
+
+/* USER CARD */
+.user-card {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid #e5eaf2;
+    box-shadow: 0 8px 24px rgba(11, 31, 58, 0.10);
+    color: #0b1f3a;
+}
+
+/* COVER IMAGE */
+.user-card .user-cover,
+.user-card .cover-image,
+.user-card .user-card-cover {
+    display: block;
+    width: 100%;
+    height: 145px;
+    min-height: 145px;
+    max-height: 145px;
+    object-fit: cover;
+    background: #0b1f3a;
+}
+
+/* COVER WRAPPER */
+.user-card .cover-container {
+    position: relative;
+    width: 100%;
+    height: 145px;
+    overflow: hidden;
+    background: #0b1f3a;
+}
+
+/* AVATAR */
+.user-card .user-avatar,
+.user-card .avatar,
+.user-card .user-photo {
+    display: block;
+    width: 100px !important;
+    height: 100px !important;
+    min-width: 100px;
+    min-height: 100px;
+    max-width: 100px;
+    max-height: 100px;
+    object-fit: cover;
+    border: 4px solid #ffffff;
+    border-radius: 50%;
+    background: #e8edf5;
+    margin: -50px auto 12px;
+    position: relative;
+    z-index: 2;
+}
+
+/* USER DETAILS */
+.user-card .user-info,
+.user-card .user-card-body {
+    padding: 16px 18px 22px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.user-card h2,
+.user-card .user-name {
+    display: block;
+    margin: 10px 0 5px;
+    color: #0b1f3a;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.user-card .username {
+    color: #64748b;
+    font-size: 14px;
+    margin-bottom: 12px;
+    overflow-wrap: anywhere;
+}
+
+.user-card .bio {
+    color: #475569;
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 10px 0;
+    overflow-wrap: anywhere;
+}
+
+.user-card .location,
+.user-card .followers-count {
+    color: #64748b;
+    font-size: 14px;
+    margin: 10px 0;
+}
+
+/* BUTTONS */
+.user-card .user-actions,
+.user-card .card-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.user-card button,
+.user-card .btn {
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    padding: 12px;
+    border-radius: 12px;
+    box-sizing: border-box;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.user-card .view-profile-btn {
+    background: #3478f6;
+    color: #ffffff;
+    border: none;
+}
+
+.user-card .follow-btn {
+    background: #eaf1ff;
+    color: #2463cf;
+    border: 1px solid #cbdcfb;
+}
+
+.user-card .message-btn {
+    grid-column: 1 / -1;
+    background: #0b1f3a;
+    color: #ffffff;
+    border: none;
+}
+
+/* CLICKABLE PROFILE NAMES */
+.user-card .profile-name-link {
+    color: #0b1f3a;
+    text-decoration: none;
+}
+
+.user-card .profile-name-link:hover {
+    color: #3478f6;
+}
+
+/* TABLET */
+@media (max-width: 900px) {
+    #usersGrid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+}
+
+/* PHONE */
+@media (max-width: 600px) {
+    #usersGrid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+        padding: 0 12px;
+    }
+
+    .user-card .user-cover,
+    .user-card .cover-image,
+    .user-card .user-card-cover,
+    .user-card .cover-container {
+        height: 130px;
+        min-height: 130px;
+        max-height: 130px;
+    }
+
+    .user-card .user-avatar,
+    .user-card .avatar,
+    .user-card .user-photo {
+        width: 90px !important;
+        height: 90px !important;
+        min-width: 90px;
+        min-height: 90px;
+        max-width: 90px;
+        max-height: 90px;
+        margin-top: -45px;
+    }
+
+    .user-card .user-info,
+    .user-card .user-card-body {
+        padding: 12px 16px 20px;
+    }
+}
+
+
+    /* =====================================
+       STATUS AND PAGINATION
+    ===================================== */
+
+    .status {
+      text-align: center;
+      padding: 35px 15px;
+      color: var(--muted);
+      line-height: 1.7;
+      background: white;
+      border-radius: 14px;
+      margin: 20px 0;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 28px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* =====================================
+       RESPONSIVE PAGE
+    ===================================== */
+
+    @media (max-width: 950px) {
+      .users-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 700px) {
+      .page {
+        margin-top: 22px;
+        padding: 0 12px 30px;
+      }
+
+      .page-heading h1 {
+        font-size: 25px;
+      }
+
+      .users-grid {
+        gap: 14px;
+      }
+
+      .search-box {
+        flex-wrap: wrap;
+        padding: 10px;
+      }
+
+      .search-box input {
+        flex-basis: 100%;
+      }
+
+      .search-box button {
+        flex: 1;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .users-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .user-card {
+        max-width: 100%;
+      }
+    }
+    
+    /* =========================================
+   FaithCircle — DISCOVER PAGE LAYOUT FIX
+   Keep these rules at the END of the style
+   section in users.html.
+========================================= */
+
+/* Prevent global styles from stretching elements */
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.page {
+  position: relative;
+  width: 100%;
+  max-width: 1150px;
+  margin-left: auto;
+  margin-right: auto;
+  isolation: isolate;
+}
+
+/* Keep the user cards in a proper grid */
+#usersGrid.users-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  align-items: start !important;
+  gap: 20px !important;
+  width: 100%;
+}
+
+/* Stop individual cards from stretching */
+#usersGrid .user-card {
+  display: flex !important;
+  flex-direction: column !important;
+  position: relative !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  background: #ffffff !important;
+  border-radius: 17px !important;
+}
+
+/* Fix the oversized cover section */
+#usersGrid .user-card .user-cover {
+  display: block !important;
+  position: relative !important;
+  flex: 0 0 125px !important;
+  width: 100% !important;
+  height: 125px !important;
+  min-height: 125px !important;
+  max-height: 125px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background-color: #0b1f3a;
+  background-position: center !important;
+  background-size: cover !important;
+  background-repeat: no-repeat !important;
+}
+
+/* Keep the card content inside the card */
+#usersGrid .user-card .user-body {
+  display: flex !important;
+  flex-direction: column !important;
+  position: relative !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 17px 20px !important;
+  overflow: visible !important;
+  background: #ffffff !important;
+}
+
+/* Correct the avatar dimensions */
+#usersGrid .user-card img.user-avatar {
+  display: block !important;
+  position: relative !important;
+  flex: 0 0 86px !important;
+  width: 86px !important;
+  min-width: 86px !important;
+  max-width: 86px !important;
+  height: 86px !important;
+  min-height: 86px !important;
+  max-height: 86px !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  aspect-ratio: 1 / 1 !important;
+  border: 4px solid #ffffff !important;
+  border-radius: 50% !important;
+  margin: -43px 0 0 !important;
+  padding: 0 !important;
+  background: #dfe6ef !important;
+  box-shadow: 0 3px 12px rgba(11, 31, 58, 0.12);
+  cursor: pointer;
+}
+
+/* Keep names and profile information readable */
+#usersGrid .user-card .user-name {
+  display: block !important;
+  position: static !important;
+  margin: 13px 0 5px !important;
+  padding: 0 !important;
+  color: #0b1f3a !important;
+  font-size: 19px !important;
+  line-height: 1.4 !important;
+  overflow-wrap: anywhere !important;
+}
+
+#usersGrid .user-card .user-username {
+  display: block !important;
+  color: #1769ff !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+
+#usersGrid .user-card .user-bio {
+  display: block !important;
+  color: #475569 !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  overflow-wrap: anywhere !important;
+  white-space: pre-wrap !important;
+}
+
+#usersGrid .user-card .user-location,
+#usersGrid .user-card .user-followers {
+  display: block !important;
+  position: static !important;
+  line-height: 1.6 !important;
+}
+
+/* Fix the action buttons */
+#usersGrid .user-card .user-actions {
+  display: flex !important;
+  position: static !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
+  align-items: stretch !important;
+  gap: 8px !important;
+  width: 100% !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#usersGrid .user-card .user-actions button {
+  display: inline-flex !important;
+  position: static !important;
+  flex: 1 1 40% !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 42px !important;
+  margin: 0 !important;
+  padding: 11px 8px !important;
+  border-radius: 9px !important;
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+  white-space: normal !important;
+}
+
+/* Make Message occupy a full row */
+#usersGrid .user-card .user-actions button:last-child {
+  flex-basis: 100% !important;
+}
+
+/* Loading and empty states */
+#status.status {
+  position: relative;
+  width: 100%;
+  height: auto;
+  min-height: 60px;
+  margin: 20px 0;
+  padding: 25px 15px;
+  background: #ffffff;
+  color: #64748b;
+  border-radius: 14px;
+}
+
+/* Tablet */
+@media (max-width: 950px) {
+  #usersGrid.users-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+/* Mobile */
+@media (max-width: 700px) {
+  .page {
+    margin-top: 18px;
+    padding: 0 12px 30px;
+  }
+
+  #usersGrid.users-grid {
+    gap: 14px !important;
+  }
+}
+
+/* Small mobile screens */
+@media (max-width: 480px) {
+  #usersGrid.users-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  #usersGrid .user-card {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  #usersGrid .user-card .user-cover {
+    flex-basis: 125px !important;
+    height: 125px !important;
+    min-height: 125px !important;
+    max-height: 125px !important;
+  }
+
+  #usersGrid .user-card img.user-avatar {
+    flex-basis: 86px !important;
+    width: 86px !important;
+    height: 86px !important;
+  }
+}
+
+/* =========================================
+   FaithCircle — COMPACT STATIC HEADER
+========================================= */
+
+nav.cns-app-nav {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+
+    min-height: 0 !important;
+    height: auto !important;
+
+    padding: 7px 16px !important;
+    margin: 0 !important;
+
+    box-sizing: border-box !important;
+}
+
+/* Brand */
+nav.cns-app-nav .cns-nav-brand {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    line-height: 1.2 !important;
+    white-space: nowrap;
+}
+
+/* Brand icon */
+nav.cns-app-nav .cns-nav-brand-icon {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+
+    font-size: 17px !important;
+    line-height: 1 !important;
+}
+
+/* Brand text */
+nav.cns-app-nav .cns-nav-brand-text {
+    font-size: 17px !important;
+    line-height: 1.2 !important;
+}
+
+/* Navigation links */
+nav.cns-app-nav .cns-nav-links {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Individual navigation link */
+nav.cns-app-nav .cns-nav-link {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 5px !important;
+
+    min-height: 32px !important;
+    padding: 5px 8px !important;
+
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+}
+
+/* Navigation icons */
+nav.cns-app-nav .cns-nav-link svg,
+nav.cns-app-nav .cns-nav-profile svg,
+nav.cns-app-nav .cns-nav-icon-button svg {
+    width: 17px !important;
+    height: 17px !important;
+    flex-shrink: 0;
+}
+
+/* Profile and sign-out section */
+nav.cns-app-nav .cns-nav-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Profile link */
+nav.cns-app-nav .cns-nav-profile {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+
+    min-height: 32px !important;
+    padding: 5px 8px !important;
+
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+    white-space: nowrap;
+}
+
+/* Sign-out button */
+nav.cns-app-nav .cns-nav-icon-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 32px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+
+    padding: 5px !important;
+    margin: 0 !important;
+}
+
+/* Tablet and mobile */
+@media (max-width: 760px) {
+    nav.cns-app-nav {
+        flex-wrap: wrap !important;
+        gap: 7px 10px !important;
+        padding: 6px 10px !important;
+    }
+
+    nav.cns-app-nav .cns-nav-brand {
+        flex: 1 1 auto;
+    }
+
+    nav.cns-app-nav .cns-nav-brand-icon {
+        width: 27px !important;
+        height: 27px !important;
+        min-width: 27px !important;
+    }
+
+    nav.cns-app-nav .cns-nav-brand-text {
+        font-size: 15px !important;
+    }
+
+    nav.cns-app-nav .cns-nav-links {
+        order: 3;
+        width: 100%;
+        justify-content: space-between !important;
+        gap: 4px !important;
+    }
+
+    nav.cns-app-nav .cns-nav-link {
+        flex: 1 1 auto;
+        gap: 4px !important;
+        padding: 5px 4px !important;
+        font-size: 11px !important;
+    }
+
+    nav.cns-app-nav .cns-nav-actions {
+        gap: 5px !important;
+    }
+
+    nav.cns-app-nav .cns-nav-profile {
+        padding: 5px !important;
+        font-size: 11px !important;
+    }
+}
+
+/* Very small phones */
+@media (max-width: 360px) {
+    nav.cns-app-nav {
+        padding: 5px 7px !important;
+    }
+
+    nav.cns-app-nav .cns-nav-link {
+        flex-direction: column;
+        gap: 2px !important;
+        font-size: 10px !important;
+    }
+
+    nav.cns-app-nav .cns-nav-link svg {
+        width: 16px !important;
+        height: 16px !important;
+    }
+}
+  </style>
+</head>
+
+<body>
+
+  <!-- ==========================================
+       FaithCircle PREMIUM TOP NAVIGATION
+  =========================================== -->
+
+  <nav class="cns-app-nav" aria-label="Main navigation">
+
+    <!-- BRAND -->
+    <a href="dashboard.html" class="cns-nav-brand">
+      <span class="cns-nav-brand-icon"><img src="faithcircle-logo.svg" alt="FaithCircle logo" class="brand-logo-image"></span>
+      <span class="cns-nav-brand-text">
+        <span>FaithCircle</span>
+      </span>
+    </a>
+
+    <!-- NAVIGATION LINKS -->
+    <div class="cns-nav-links">
+
+      <a href="dashboard.html"
+         class="cns-nav-link"
+         title="Home"
+         aria-label="Home">
+
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 10.5 12 3l9 7.5"></path>
+          <path d="M5.5 9.5V21h13V9.5"></path>
+          <path d="M9 21v-7h6v7"></path>
+        </svg>
+
+        <span>Home</span>
+      </a>
+
+      <a href="users.html"
+         class="cns-nav-link active"
+         aria-current="page"
+         title="Discover"
+         aria-label="Discover">
+
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="10.8" cy="10.8" r="7.2"></circle>
+          <path d="m16 16 5 5"></path>
+          <path d="m10.8 7.5 1.3 2 2.3 1.3-2.3 1.2-1.3 2-1.2-2-2.1-1.2 2.1-1.3z"></path>
+        </svg>
+
+        <span>Discover</span>
+      </a>
+
+      <a href="notifications.html"
+         class="cns-nav-link"
+         title="Notifications"
+         aria-label="Notifications">
+
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>
+          <path d="M10 21h4"></path>
+        </svg>
+
+        <span>Notifications</span>
+      </a>
+
+      <a href="messages.html"
+         class="cns-nav-link"
+         title="Messages"
+         aria-label="Messages">
+
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5z"></path>
+        </svg>
+
+        <span>Messages</span>
+      </a>
+
+    </div>
+
+    <!-- PROFILE AND SIGN OUT -->
+    <div class="cns-nav-actions">
+
+      <a href="profile.html"
+         class="cns-nav-profile"
+         title="My profile"
+         aria-label="My profile">
+
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="8" r="4"></circle>
+          <path d="M4 21a8 8 0 0 1 16 0"></path>
+        </svg>
+
+        <span>My Profile</span>
+      </a>
+
+      <button
+        id="logoutLink"
+        class="cns-nav-icon-button"
+        type="button"
+        title="Sign out"
+        aria-label="Sign out">
+
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M10 17l5-5-5-5"></path>
+          <path d="M15 12H3"></path>
+          <path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"></path>
+        </svg>
+
+      </button>
+
+    </div>
+
+  </nav>
+
+  <!-- ==========================================
+       DISCOVER USERS PAGE
+  =========================================== -->
+
+  <main class="page">
+
+    <div class="page-heading">
+      <h1>Discover People</h1>
+      <p>
+        Find your FaithCircle community
+      </p>
+    </div>
+
+    <form class="search-box" id="searchForm">
+
+      <input
+        type="search"
+        id="searchInput"
+        maxlength="100"
+        placeholder="Search by name or username..."
+        aria-label="Search users"
+      >
+
+      <button class="btn btn-primary" type="submit">
+        Search
+      </button>
+
+      <button class="btn btn-light" type="button" id="clearSearch">
+        Clear
+      </button>
+
+    </form>
+
+    <div id="status" class="status">
+      Loading users...
+    </div>
+
+    <div id="usersGrid" class="users-grid"></div>
+
+    <div class="pagination">
+      <button
+        id="loadMoreButton"
+        class="btn btn-dark hidden"
+        type="button"
+      >
+        Load More
+      </button>
+    </div>
+
+  </main>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const client = window.supabaseClient;
+      const $ = id => document.getElementById(id);
+
+      if (!client) {
+        $("status").textContent =
+          "Supabase connection not found. Check supabase-config.js.";
+        return;
+      }
+
+      const PAGE_SIZE = 12;
+
+      let currentUser = null;
+      let currentOffset = 0;
+      let currentSearch = "";
+      let hasMore = true;
+      let loading = false;
+      let searchVersion = 0;
+
+      const followingIds = new Set();
+      const followerCounts = new Map();
+
+      function showAlert(icon, title, text) {
+        if (window.Swal) {
+          return Swal.fire({ icon, title, text });
+        }
+
+        alert(title + (text ? "\n" + text : ""));
+        return Promise.resolve();
+      }
+
+      function safeImage(url, name = "User") {
+        if (url) {
+          try {
+            const parsed = new URL(url);
+
+            if (
+              parsed.protocol === "https:" ||
+              parsed.protocol === "http:"
+            ) {
+              return parsed.href;
+            }
+          } catch (_) {}
+        }
+
+        const initial =
+          (name || "U").trim().charAt(0).toUpperCase() || "U";
+
+        const svg = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200">
+            <rect width="100%" height="100%" fill="#dfe6ef"/>
+            <text x="50%" y="55%" text-anchor="middle"
+              font-size="90" font-family="Arial" fill="#0b1f3a">
+              ${initial.replace(/[<>&"']/g, "")}
+            </text>
+          </svg>
+        `;
+
+        return "data:image/svg+xml;charset=UTF-8," +
+          encodeURIComponent(svg);
+      }
+
+      function setStatus(message) {
+        $("status").textContent = message;
+        $("status").classList.remove("hidden");
+      }
+
+      function hideStatus() {
+        $("status").classList.add("hidden");
+      }
+
+      function safeSearchPattern(value) {
+        return value.replace(/[,%()]/g, " ").trim();
+      }
+
+      async function loadFollowing() {
+        followingIds.clear();
+
+        const { data, error } = await client
+          .from("follows")
+          .select("following_id")
+          .eq("follower_id", currentUser.id);
+
+        if (error) {
+          console.warn("Could not load following list:", error);
+          return;
+        }
+
+        (data || []).forEach(row => {
+          followingIds.add(row.following_id);
+        });
+      }
+
+      async function loadFollowerCounts(userIds) {
+        const uniqueIds = [...new Set(userIds)];
+
+        if (!uniqueIds.length) return;
+
+        const { data, error } = await client
+          .from("follows")
+          .select("following_id")
+          .in("following_id", uniqueIds);
+
+        if (error) {
+          console.warn("Could not load follower counts:", error);
+          return;
+        }
+
+        uniqueIds.forEach(id => followerCounts.set(id, 0));
+
+        (data || []).forEach(row => {
+          followerCounts.set(
+            row.following_id,
+            (followerCounts.get(row.following_id) || 0) + 1
+          );
+        });
+      }
+
+      function createButton(text, className, handler) {
+        const button = document.createElement("button");
+
+        button.type = "button";
+        button.className = "btn " + className;
+        button.textContent = text;
+        button.addEventListener("click", handler);
+
+        return button;
+      }
+
+    // =============================================
+// CREATE USER CARD — FaithCircle
+// =============================================
+
+function createUserCard(user) {
+    const card = document.createElement("article");
+    card.className = "user-card";
+
+    // -----------------------------------------
+    // COVER IMAGE
+    // -----------------------------------------
+
+    const cover = document.createElement("div");
+    cover.className = "user-cover";
+
+    cover.style.setProperty("width", "100%", "important");
+    cover.style.setProperty("height", "130px", "important");
+    cover.style.setProperty("min-height", "130px", "important");
+    cover.style.setProperty("max-height", "130px", "important");
+    cover.style.setProperty("overflow", "hidden", "important");
+    cover.style.setProperty("background-color", "#0b1f3a", "important");
+    cover.style.setProperty("background-position", "center", "important");
+    cover.style.setProperty("background-size", "cover", "important");
+    cover.style.setProperty("background-repeat", "no-repeat", "important");
+    cover.style.setProperty("box-sizing", "border-box", "important");
+
+    if (user.cover_url) {
+        const safeCoverUrl = safeImage(
+            user.cover_url,
+            user.full_name || user.username
+        );
+
+        if (safeCoverUrl) {
+            cover.style.backgroundImage =
+                `url("${safeCoverUrl.replace(/["\\]/g, "")}")`;
+        }
+    }
+
+    // -----------------------------------------
+    // CARD BODY
+    // -----------------------------------------
+
+    const body = document.createElement("div");
+    body.className = "user-body";
+
+    body.style.setProperty("position", "relative", "important");
+    body.style.setProperty("display", "flex", "important");
+    body.style.setProperty("flex-direction", "column", "important");
+    body.style.setProperty("align-items", "center", "important");
+    body.style.setProperty("width", "100%", "important");
+    body.style.setProperty("min-width", "0", "important");
+    body.style.setProperty("height", "auto", "important");
+    body.style.setProperty("min-height", "0", "important");
+    body.style.setProperty("padding", "0 18px 22px", "important");
+    body.style.setProperty("box-sizing", "border-box", "important");
+    body.style.setProperty("background", "#ffffff", "important");
+    body.style.setProperty("overflow", "visible", "important");
+    body.style.setProperty("text-align", "center", "important");
+
+    // -----------------------------------------
+    // AVATAR
+    // -----------------------------------------
+
+    const avatar = document.createElement("img");
+
+    avatar.className = "user-avatar";
+    avatar.src = safeImage(
+        user.avatar_url,
+        user.full_name || user.username
+    );
+
+    avatar.alt =
+        (user.full_name || user.username || "User") +
+        "'s profile picture";
+
+    avatar.loading = "lazy";
+    avatar.width = 86;
+    avatar.height = 86;
+
+    avatar.style.setProperty("display", "block", "important");
+    avatar.style.setProperty("width", "86px", "important");
+    avatar.style.setProperty("height", "86px", "important");
+    avatar.style.setProperty("min-width", "86px", "important");
+    avatar.style.setProperty("min-height", "86px", "important");
+    avatar.style.setProperty("max-width", "86px", "important");
+    avatar.style.setProperty("max-height", "86px", "important");
+    avatar.style.setProperty("flex", "0 0 86px", "important");
+    avatar.style.setProperty("object-fit", "cover", "important");
+    avatar.style.setProperty("object-position", "center", "important");
+    avatar.style.setProperty("border-radius", "50%", "important");
+    avatar.style.setProperty("border", "4px solid #ffffff", "important");
+    avatar.style.setProperty("background", "#e8edf5", "important");
+    avatar.style.setProperty("margin", "-43px auto 12px", "important");
+    avatar.style.setProperty("position", "relative", "important");
+    avatar.style.setProperty("z-index", "2", "important");
+    avatar.style.setProperty("cursor", "pointer", "important");
+
+    // Make avatar available to the photo viewer.
+    avatar.dataset.photoPreview = "true";
+    avatar.dataset.photoUrl = user.avatar_url || "";
+    avatar.dataset.photoCaption =
+        (user.full_name || user.username || "User") +
+        "'s profile picture";
+
+    // -----------------------------------------
+    // USER NAME — CLICKABLE
+    // -----------------------------------------
+
+    const name = document.createElement("h2");
+    name.className = "user-name";
+
+    const profileLink = document.createElement("a");
+
+    profileLink.href =
+        "profile.html?id=" + encodeURIComponent(user.id);
+
+    profileLink.textContent =
+        user.full_name || user.username || "FaithCircle member";
+
+    profileLink.className = "profile-name-link";
+
+    profileLink.style.setProperty("color", "#0b1f3a", "important");
+    profileLink.style.setProperty("text-decoration", "none", "important");
+    profileLink.style.setProperty("font-size", "19px", "important");
+    profileLink.style.setProperty("font-weight", "700", "important");
+    profileLink.style.setProperty("overflow-wrap", "anywhere", "important");
+
+    name.style.setProperty("display", "block", "important");
+    name.style.setProperty("width", "100%", "important");
+    name.style.setProperty("height", "auto", "important");
+    name.style.setProperty("margin", "5px 0", "important");
+    name.style.setProperty("padding", "0", "important");
+    name.style.setProperty("line-height", "1.4", "important");
+    name.style.setProperty("overflow", "visible", "important");
+    name.style.setProperty("visibility", "visible", "important");
+    name.style.setProperty("opacity", "1", "important");
+
+    name.appendChild(profileLink);
+
+    // -----------------------------------------
+    // USERNAME
+    // -----------------------------------------
+
+    const username = document.createElement("div");
+
+    username.className = "user-username";
+    username.textContent = user.username
+        ? "@" + user.username
+        : "";
+
+    username.style.setProperty("display", "block", "important");
+    username.style.setProperty("width", "100%", "important");
+    username.style.setProperty("color", "#64748b", "important");
+    username.style.setProperty("font-size", "14px", "important");
+    username.style.setProperty("margin", "0 0 12px", "important");
+    username.style.setProperty("overflow-wrap", "anywhere", "important");
+
+    // -----------------------------------------
+    // BIO
+    // -----------------------------------------
+
+    const bio = document.createElement("p");
+
+    bio.className = "user-bio";
+    bio.textContent = user.bio || "No bio added yet.";
+
+    bio.style.setProperty("display", "block", "important");
+    bio.style.setProperty("width", "100%", "important");
+    bio.style.setProperty("height", "auto", "important");
+    bio.style.setProperty("color", "#475569", "important");
+    bio.style.setProperty("font-size", "14px", "important");
+    bio.style.setProperty("line-height", "1.6", "important");
+    bio.style.setProperty("margin", "8px 0", "important");
+    bio.style.setProperty("overflow-wrap", "anywhere", "important");
+
+    // -----------------------------------------
+    // LOCATION
+    // -----------------------------------------
+
+    const locationElement = document.createElement("div");
+
+    locationElement.className = "user-location";
+
+    locationElement.textContent = user.location
+        ? "Location: " + user.location
+        : "Location not added";
+
+    locationElement.style.setProperty("display", "block", "important");
+    locationElement.style.setProperty("width", "100%", "important");
+    locationElement.style.setProperty("color", "#64748b", "important");
+    locationElement.style.setProperty("font-size", "13px", "important");
+    locationElement.style.setProperty("margin", "8px 0", "important");
+    locationElement.style.setProperty("overflow-wrap", "anywhere", "important");
+
+    // -----------------------------------------
+    // FOLLOWER COUNT
+    // -----------------------------------------
+
+    const followers = document.createElement("div");
+
+    followers.className = "user-followers";
+
+    followers.textContent =
+        (followerCounts.get(user.id) || 0) +
+        " followers";
+
+    followers.style.setProperty("display", "block", "important");
+    followers.style.setProperty("width", "100%", "important");
+    followers.style.setProperty("color", "#64748b", "important");
+    followers.style.setProperty("font-size", "14px", "important");
+    followers.style.setProperty("margin", "10px 0", "important");
+
+    // -----------------------------------------
+    // ACTION BUTTONS
+    // -----------------------------------------
+
+    const actions = document.createElement("div");
+
+    actions.className = "user-actions";
+
+    actions.style.setProperty("display", "grid", "important");
+    actions.style.setProperty(
+        "grid-template-columns",
+        "repeat(2, minmax(0, 1fr))",
+        "important"
+    );
+    actions.style.setProperty("gap", "10px", "important");
+    actions.style.setProperty("width", "100%", "important");
+    actions.style.setProperty("margin-top", "16px", "important");
+    actions.style.setProperty("box-sizing", "border-box", "important");
+
+    // VIEW PROFILE
+
+    const viewButton = createButton(
+        "View Profile",
+        "btn-primary",
+        () => {
+            window.location.href =
+                "profile.html?id=" +
+                encodeURIComponent(user.id);
+        }
+    );
+
+    // FOLLOW / UNFOLLOW
+
+    const isFollowing = followingIds.has(user.id);
+
+    const followButton = createButton(
+        isFollowing ? "Following" : "Follow",
+        isFollowing ? "btn-light" : "btn-dark",
+        async () => {
+            await toggleFollow(
+                user,
+                followButton,
+                followers
+            );
+        }
+    );
+
+    followButton.dataset.following =
+        isFollowing ? "true" : "false";
+
+    // MESSAGE
+
+    const messageButton = createButton(
+        "Message",
+        "btn-dark",
+        () => {
+            if (!currentUser) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            if (user.id === currentUser.id) {
+                showAlert(
+                    "info",
+                    "Your own profile",
+                    "You cannot start a private conversation with yourself."
+                );
+                return;
+            }
+
+            window.location.href =
+                "messages.html?user_id=" +
+                encodeURIComponent(user.id);
+        }
+    );
+
+    // Keep button widths within the card.
+    [viewButton, followButton, messageButton].forEach(button => {
+        button.style.setProperty("width", "100%", "important");
+        button.style.setProperty("min-width", "0", "important");
+        button.style.setProperty("max-width", "100%", "important");
+        button.style.setProperty("min-height", "46px", "important");
+        button.style.setProperty("box-sizing", "border-box", "important");
+    });
+
+    messageButton.style.setProperty(
+        "grid-column",
+        "1 / -1",
+        "important"
+    );
+
+    actions.append(
+        viewButton,
+        followButton,
+        messageButton
+    );
+
+    // -----------------------------------------
+    // ASSEMBLE CARD
+    // -----------------------------------------
+
+    body.append(
+        avatar,
+        name,
+        username,
+        bio,
+        locationElement,
+        followers,
+        actions
+    );
+
+    card.append(cover, body);
+
+    // Prevent a broken avatar URL from leaving a broken image.
+    avatar.addEventListener("error", function () {
+        this.style.setProperty("background", "#e8edf5", "important");
+        this.alt = "Profile picture unavailable";
+    }, { once: true });
+
+    return card;
+}
+
+      async function toggleFollow(user, button, followersElement) {
+        if (button.disabled || !currentUser) return;
+
+        const currentlyFollowing =
+          button.dataset.following === "true";
+
+        button.disabled = true;
+        button.textContent = "Please wait...";
+
+        try {
+          if (currentlyFollowing) {
+            const { error } = await client
+              .from("follows")
+              .delete()
+              .eq("follower_id", currentUser.id)
+              .eq("following_id", user.id);
+
+            if (error) throw error;
+
+            followingIds.delete(user.id);
+
+            button.dataset.following = "false";
+            button.textContent = "Follow";
+            button.className = "btn btn-dark";
+
+            followerCounts.set(
+              user.id,
+              Math.max(
+                0,
+                (followerCounts.get(user.id) || 0) - 1
+              )
+            );
+
+          } else {
+            const { error } = await client
+              .from("follows")
+              .insert({
+                follower_id: currentUser.id,
+                following_id: user.id
+              });
+
+            if (error && error.code !== "23505") {
+              throw error;
+            }
+
+            if (!error) {
+              followerCounts.set(
+                user.id,
+                (followerCounts.get(user.id) || 0) + 1
+              );
+            }
+
+            followingIds.add(user.id);
+
+            button.dataset.following = "true";
+            button.textContent = "Following";
+            button.className = "btn btn-light";
+          }
+
+          followersElement.textContent =
+            (followerCounts.get(user.id) || 0) + " followers";
+
+        } catch (error) {
+          console.error("Follow action failed:", error);
+
+          await showAlert(
+            "error",
+            "Could not update follow status",
+            error.message || "Please try again."
+          );
+
+          button.textContent =
+            currentlyFollowing ? "Following" : "Follow";
+
+        } finally {
+          button.disabled = false;
+        }
+      }
+
+      async function loadUsers(reset = false) {
+        if (loading) return;
+
+        if (reset) {
+          currentOffset = 0;
+          hasMore = true;
+          $("usersGrid").replaceChildren();
+          $("loadMoreButton").classList.add("hidden");
+          setStatus("Loading users...");
+        }
+
+        if (!hasMore) return;
+
+        loading = true;
+        $("loadMoreButton").disabled = true;
+
+        const thisSearchVersion = searchVersion;
+
+        try {
+          let query = client
+            .from("profiles")
+            .select(
+              "id, username, full_name, bio, avatar_url, cover_url, location, created_at"
+            )
+            .neq("id", currentUser.id)
+            .order("created_at", { ascending: false })
+            .range(
+              currentOffset,
+              currentOffset + PAGE_SIZE - 1
+            );
+
+          if (currentSearch) {
+            const pattern = safeSearchPattern(currentSearch);
+
+            if (pattern) {
+              query = query.or(
+                `username.ilike.%${pattern}%,full_name.ilike.%${pattern}%`
+              );
+            }
+          }
+
+          const { data: users, error } = await query;
+
+          if (error) throw error;
+
+          if (thisSearchVersion !== searchVersion) return;
+
+          if (!users || users.length === 0) {
+            hasMore = false;
+
+            if (currentOffset === 0) {
+              setStatus(
+                currentSearch
+                  ? "No users found. Try another name or username."
+                  : "No other users have registered yet."
+              );
+            }
+
+            $("loadMoreButton").classList.add("hidden");
+            return;
+          }
+
+          await loadFollowerCounts(
+            users.map(user => user.id)
+          );
+
+          if (thisSearchVersion !== searchVersion) return;
+
+          hideStatus();
+
+          users.forEach(user => {
+            $("usersGrid").appendChild(
+              createUserCard(user)
+            );
+          });
+
+          currentOffset += users.length;
+          hasMore = users.length === PAGE_SIZE;
+
+          $("loadMoreButton").classList.toggle(
+            "hidden",
+            !hasMore
+          );
+
+        } catch (error) {
+          console.error("Discover users error:", error);
+
+          setStatus(
+            "Could not load users. Please refresh the page and try again."
+          );
+
+          await showAlert(
+            "error",
+            "Unable to load users",
+            error.message || "Check your connection and try again."
+          );
+
+        } finally {
+          loading = false;
+          $("loadMoreButton").disabled = false;
+        }
+      }
+
+      $("searchForm").addEventListener("submit", async event => {
+        event.preventDefault();
+
+        currentSearch = $("searchInput").value.trim();
+        searchVersion++;
+
+        await loadUsers(true);
+      });
+
+      $("clearSearch").addEventListener("click", async () => {
+        $("searchInput").value = "";
+        currentSearch = "";
+        searchVersion++;
+
+        await loadUsers(true);
+      });
+
+      $("loadMoreButton").addEventListener("click", () => {
+        loadUsers(false);
+      });
+
+      $("logoutLink").addEventListener("click", async () => {
+        const result = await Swal.fire({
+          title: "Sign out?",
+          text: "You will need to log in again.",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Sign Out",
+          cancelButtonText: "Cancel"
+        });
+
+        if (!result.isConfirmed) return;
+
+        const { error } = await client.auth.signOut();
+
+        if (error) {
+          await showAlert(
+            "error",
+            "Sign out failed",
+            error.message
+          );
+          return;
+        }
+
+        window.location.href = "login.html";
+      });
+
+      async function start() {
+        setStatus("Checking your login...");
+
+        try {
+          const { data, error } = await client.auth.getUser();
+
+          if (error || !data.user) {
+            window.location.href = "login.html";
+            return;
+          }
+
+          currentUser = data.user;
+
+          await loadFollowing();
+          await loadUsers(true);
+
+        } catch (error) {
+          console.error("Initialization failed:", error);
+
+          setStatus(
+            "Unable to connect to FaithCircle. Check your internet connection and Supabase configuration."
+          );
+        }
+      }
+
+      start();
+
+    })();
+  </script>
+
+
+</body>
+</html>

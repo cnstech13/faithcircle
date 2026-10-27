@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1f3a">
+    <meta name="description" content="Log in to FaithCircle to connect with friends, share moments, and continue your conversations.">
+
+    <title>Log In | FaithCircle</title>
+
+    <link rel="stylesheet" href="global.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body.auth-page {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #172033;
+            background:
+                radial-gradient(circle at 85% 15%, rgba(53, 224, 208, 0.12), transparent 28%),
+                linear-gradient(145deg, #f4f7fb, #eaf2ff);
+        }
+
+        /* TOP NAVIGATION */
+
+        .login-navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            min-height: 76px;
+            padding: 13px 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            background: linear-gradient(120deg, #0b1f3a, #123c70);
+            border-bottom: 3px solid #35e0d0;
+            box-shadow: 0 5px 20px rgba(11, 31, 58, 0.12);
+        }
+
+        .login-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 11px;
+            color: #ffffff;
+            font-size: 21px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .login-brand-icon {
+            width: 43px;
+            height: 43px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-radius: 13px;
+            background: linear-gradient(135deg, #1769ff, #35e0d0);
+            color: #ffffff;
+            font-size: 26px;
+            font-weight: 900;
+        }
+
+        .register-nav-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 10px 17px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            color: #ffffff;
+            background: #1769ff;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: 0.2s ease;
+        }
+
+        .register-nav-button:hover {
+            color: #0b1f3a;
+            background: #35e0d0;
+        }
+
+        /* MAIN AREA */
+
+        .auth-container {
+            width: 100%;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 50px 18px;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 465px;
+            padding: 38px;
+            border: 1px solid #e3eaf5;
+            border-radius: 25px;
+            background: #ffffff;
+            box-shadow: 0 20px 65px rgba(11, 31, 58, 0.10);
+        }
+
+        .auth-logo {
+            width: 66px;
+            height: 66px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 22px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #0b1f3a, #1769ff, #35e0d0);
+            color: #ffffff;
+            font-size: 38px;
+            font-weight: 900;
+            box-shadow: 0 9px 22px rgba(23, 105, 255, 0.2);
+        }
+
+        .auth-card h1 {
+            margin: 0 0 12px;
+            color: #0b1f3a;
+            text-align: center;
+            font-size: 30px;
+            letter-spacing: -0.6px;
+        }
+
+        .auth-description {
+            margin: 0 auto 28px;
+            max-width: 340px;
+            color: #647087;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        /* FORM */
+
+        #loginForm {
+            width: 100%;
+        }
+
+        .form-group {
+            margin-bottom: 21px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 9px;
+            color: #172033;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .form-group input {
+            display: block;
+            width: 100%;
+            min-height: 49px;
+            padding: 13px 15px;
+            border: 1px solid #d8e1ef;
+            border-radius: 12px;
+            outline: none;
+            background: #f9fbff;
+            color: #172033;
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-group input::placeholder {
+            color: #98a4b7;
+        }
+
+        .form-group input:focus {
+            border-color: #1769ff;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(23, 105, 255, 0.10);
+        }
+
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .password-wrapper input {
+            padding-right: 76px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            border: none;
+            border-radius: 7px;
+            background: transparent;
+            color: #1769ff;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .password-toggle:hover {
+            background: #eaf3ff;
+        }
+
+        .password-toggle:focus-visible,
+        .forgot-password button:focus-visible {
+            outline: 2px solid #1769ff;
+            outline-offset: 3px;
+        }
+
+        .forgot-password {
+            margin: -3px 0 22px;
+            text-align: right;
+        }
+
+        .forgot-password button {
+            padding: 4px 0;
+            border: none;
+            background: transparent;
+            color: #1769ff;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .forgot-password button:hover {
+            text-decoration: underline;
+        }
+
+        /* LOGIN BUTTON */
+
+        .auth-button {
+            width: 100%;
+            min-height: 51px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 18px;
+            border: none;
+            border-radius: 13px;
+            background: linear-gradient(110deg, #1769ff, #1254d9);
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 7px 18px rgba(23, 105, 255, 0.20);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .auth-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 11px 25px rgba(23, 105, 255, 0.27);
+        }
+
+        .auth-button:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .form-message {
+            margin: 14px 0 0;
+            text-align: center;
+            font-size: 13px;
+            line-height: 1.7;
+            overflow-wrap: anywhere;
+        }
+
+        .form-message:empty {
+            display: none;
+        }
+
+        .form-message.error {
+            color: #dc2626;
+        }
+
+        .form-message.success {
+            color: #15803d;
+        }
+
+        .auth-switch {
+            margin-top: 26px;
+            padding-top: 22px;
+            border-top: 1px solid #edf1f7;
+            text-align: center;
+            color: #647087;
+            font-size: 14px;
+        }
+
+        .auth-switch a {
+            color: #1769ff;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .auth-switch a:hover {
+            text-decoration: underline;
+        }
+
+        /* FOOTER */
+
+        .login-footer {
+            padding: 20px 15px;
+            background: #07172c;
+            color: #a9b8cd;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .login-footer p {
+            margin: 0;
+        }
+
+        /* MOBILE */
+
+        @media (max-width: 520px) {
+            .login-navbar {
+                min-height: 68px;
+                padding: 11px 14px;
+                gap: 9px;
+            }
+
+            .login-brand {
+                gap: 8px;
+                font-size: 17px;
+            }
+
+            .login-brand-icon {
+                width: 38px;
+                height: 38px;
+                border-radius: 11px;
+                font-size: 23px;
+            }
+
+            .register-nav-button {
+                min-height: 39px;
+                padding: 9px 11px;
+                border-radius: 10px;
+                font-size: 12px;
+            }
+
+            .auth-container {
+                padding: 32px 14px;
+                align-items: flex-start;
+            }
+
+            .auth-card {
+                padding: 28px 21px;
+                border-radius: 21px;
+            }
+
+            .auth-logo {
+                width: 58px;
+                height: 58px;
+                font-size: 33px;
+                border-radius: 17px;
+                margin-bottom: 18px;
+            }
+
+            .auth-card h1 {
+                font-size: 27px;
+            }
+        }
+
+        @media (max-width: 350px) {
+            .login-navbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .auth-card {
+                padding: 25px 16px;
+            }
+        }
+    </style>
+</head>
+
+<body class="auth-page">
+
+    <!-- TOP NAVIGATION -->
+    <header class="login-navbar">
+
+        <a href="index.html" class="login-brand">
+            <span class="login-brand-icon"><img src="faithcircle-logo.svg" alt="FaithCircle logo" class="brand-logo-image"></span>
+            <span>FaithCircle</span>
+        </a>
+
+        <a href="register.html" class="register-nav-button">
+            Create Account
+        </a>
+
+    </header>
+
+    <!-- LOGIN SECTION -->
+    <main class="auth-container">
+
+        <section class="auth-card">
+
+            <div class="auth-logo" aria-hidden="true"><img src="faithcircle-logo.svg" alt="FaithCircle logo" class="brand-logo-image"></div>
+
+            <h1>Welcome Back!</h1>
+
+            <p class="auth-description">
+                Log in to connect with friends, share moments,
+                and continue your conversations.
+            </p>
+
+            <form id="loginForm">
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email address"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+
+                    <label for="password">Password</label>
+
+                    <div class="password-wrapper">
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            id="togglePassword"
+                            aria-controls="password"
+                            aria-pressed="false"
+                        >
+                            Show
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="forgot-password">
+
+                    <button
+                        type="button"
+                        id="forgotPasswordButton"
+                    >
+                        Forgot Password?
+                    </button>
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary auth-button"
+                    id="loginButton"
+                >
+                    Log In
+                </button>
+
+                <p
+                    id="formMessage"
+                    class="form-message"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+
+            </form>
+
+            <div class="auth-switch">
+                Don't have an account?
+                <a href="register.html">Create one</a>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="login-footer">
+        <p>
+            &copy; <span id="currentYear"></span>
+            FaithCircle. All rights reserved.
+        </p>
+    </footer>
+
+    <!-- SUPABASE CONFIGURATION -->
+    <script src="supabase-config.js"></script>
+  <script src="FaithCircle-live-enhancements.js" defer></script>
+
+    <script>
+        // =====================================
+        // FaithCircle - LOGIN SYSTEM
+        // =====================================
+
+        const loginForm = document.getElementById("loginForm");
+        const emailInput = document.getElementById("email");
+        const passwordInput = document.getElementById("password");
+
+        const togglePasswordButton =
+            document.getElementById("togglePassword");
+
+        const forgotPasswordButton =
+            document.getElementById("forgotPasswordButton");
+
+        const loginButton = document.getElementById("loginButton");
+        const formMessage = document.getElementById("formMessage");
+
+        document.getElementById("currentYear").textContent =
+            new Date().getFullYear();
+
+
+        // =====================================
+        // SHOW / HIDE PASSWORD
+        // =====================================
+
+        togglePasswordButton.addEventListener("click", function () {
+
+            const passwordIsHidden =
+                passwordInput.type === "password";
+
+            passwordInput.type =
+                passwordIsHidden ? "text" : "password";
+
+            togglePasswordButton.textContent =
+                passwordIsHidden ? "Hide" : "Show";
+
+            togglePasswordButton.setAttribute(
+                "aria-pressed",
+                String(passwordIsHidden)
+            );
+
+        });
+
+
+        // =====================================
+        // SHOW FORM MESSAGE
+        // =====================================
+
+        function showMessage(message, type) {
+
+            formMessage.textContent = message;
+
+            formMessage.classList.remove("error", "success");
+
+            if (type) {
+                formMessage.classList.add(type);
+            }
+        }
+
+
+        // =====================================
+        // GET SUPABASE CLIENT
+        // =====================================
+
+        function getSupabaseClient() {
+
+            if (window.supabaseClient) {
+                return window.supabaseClient;
+            }
+
+            if (
+                window.CNS_SUPABASE &&
+                typeof window.CNS_SUPABASE.auth !== "undefined"
+            ) {
+                return window.CNS_SUPABASE;
+            }
+
+            return null;
+        }
+
+
+        // =====================================
+        // LOGIN
+        // =====================================
+
+        loginForm.addEventListener("submit", async function (event) {
+
+            event.preventDefault();
+
+            const supabase = getSupabaseClient();
+
+            if (!supabase) {
+                showMessage(
+                    "Supabase is not connected. Please check supabase-config.js.",
+                    "error"
+                );
+                return;
+            }
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+
+            if (!email || !password) {
+                showMessage(
+                    "Please enter your email address and password.",
+                    "error"
+                );
+                return;
+            }
+
+            loginButton.disabled = true;
+            loginButton.textContent = "Logging in...";
+            showMessage("", "");
+
+            try {
+
+                const { error } =
+                    await supabase.auth.signInWithPassword({
+                        email: email,
+                        password: password
+                    });
+
+                if (error) {
+                    throw error;
+                }
+
+                showMessage(
+                    "Login successful! Redirecting...",
+                    "success"
+                );
+
+                setTimeout(function () {
+                    window.location.href = "dashboard.html";
+                }, 1000);
+
+            } catch (error) {
+
+                showMessage(
+                    error.message ||
+                    "Login failed. Please check your details.",
+                    "error"
+                );
+
+            } finally {
+
+                loginButton.disabled = false;
+                loginButton.textContent = "Log In";
+
+            }
+
+        });
+
+
+        // =====================================
+        // FORGOT PASSWORD
+        // =====================================
+
+        forgotPasswordButton.addEventListener(
+            "click",
+            async function () {
+
+                const supabase = getSupabaseClient();
+
+                if (!supabase) {
+                    showMessage(
+                        "Supabase is not connected. Check your configuration.",
+                        "error"
+                    );
+                    return;
+                }
+
+                let email = emailInput.value.trim();
+
+                if (!email && typeof Swal !== "undefined") {
+
+                    const result = await Swal.fire({
+                        title: "Reset your password",
+                        text: "Enter the email address associated with your account.",
+                        input: "email",
+                        inputPlaceholder: "you@example.com",
+                        inputAttributes: {
+                            autocomplete: "email",
+                            "aria-label": "Email address"
+                        },
+                        showCancelButton: true,
+                        confirmButtonText: "Send Reset Link",
+                        cancelButtonText: "Cancel",
+                        confirmButtonColor: "#1769ff",
+                        inputValidator: function (value) {
+                            if (!value) {
+                                return "Please enter your email address.";
+                            }
+                        }
+                    });
+
+                    if (!result.isConfirmed) {
+                        return;
+                    }
+
+                    email = result.value.trim();
+
+                } else if (!email) {
+
+                    email = prompt(
+                        "Enter your account email address:"
+                    );
+
+                    if (!email) {
+                        return;
+                    }
+
+                    email = email.trim();
+
+                }
+
+                await sendPasswordReset(email, supabase);
+
+            }
+        );
+
+
+        // =====================================
+        // SEND PASSWORD RESET EMAIL
+        // =====================================
+
+        async function sendPasswordReset(email, supabase) {
+
+            if (!email) {
+                showMessage(
+                    "Please enter your email address.",
+                    "error"
+                );
+                return;
+            }
+
+            forgotPasswordButton.disabled = true;
+            forgotPasswordButton.textContent = "Sending link...";
+
+            try {
+
+                const redirectUrl = new URL(
+                    "reset-password.html",
+                    window.location.href
+                ).href;
+
+                const { error } =
+                    await supabase.auth.resetPasswordForEmail(
+                        email,
+                        {
+                            redirectTo: redirectUrl
+                        }
+                    );
+
+                if (error) {
+                    throw error;
+                }
+
+                const successMessage =
+                    "If an account exists for that email, a reset link will be sent. Check your inbox and spam folder.";
+
+                showMessage(successMessage, "success");
+
+                if (typeof Swal !== "undefined") {
+                    await Swal.fire({
+                        icon: "success",
+                        title: "Check your email",
+                        text: successMessage,
+                        confirmButtonColor: "#1769ff"
+                    });
+                }
+
+            } catch (error) {
+
+                showMessage(
+                    error.message ||
+                    "Unable to request a password reset. Please try again.",
+                    "error"
+                );
+
+            } finally {
+
+                forgotPasswordButton.disabled = false;
+                forgotPasswordButton.textContent = "Forgot Password?";
+
+            }
+
+        }
+
+    </script>
+
+</body>
+</html>

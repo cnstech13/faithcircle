@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#0b1f3a">
+    <meta name="description" content="FaithCircle brings social networking, messaging, videos, and group chats together in one place.">
+
+    <title>FaithCircle - Connect. Communicate. Share.</title>
+
+    <link rel="stylesheet" href="global.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+            margin: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f7fb;
+            color: #172033;
+        }
+
+        /* MAIN PAGE LAYOUT */
+
+        .landing-page {
+            min-height: 100svh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* NAVIGATION */
+
+        .landing-navbar {
+            min-height: 62px;
+            padding: 8px 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: linear-gradient(120deg, #0b1f3a, #123c70);
+            border-bottom: 3px solid #35e0d0;
+        }
+
+        .landing-logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            color: #ffffff;
+            font-size: 21px;
+            font-weight: 800;
+            text-decoration: none;
+            min-width: 0;
+        }
+
+        .landing-logo-icon {
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #1769ff, #35e0d0);
+            flex-shrink: 0;
+        }
+
+        .brand-logo-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .landing-nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .landing-nav-actions a {
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .landing-login {
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .landing-register {
+            color: #ffffff;
+            background: #1769ff;
+            border: 1px solid #1769ff;
+        }
+
+        /* MAIN CONTENT */
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hero {
+            flex: 1;
+            padding: 25px 5% 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(53, 224, 208, 0.13),
+                    transparent 35%
+                ),
+                linear-gradient(180deg, #ffffff, #f4f7fb);
+        }
+
+        .hero h1 {
+            margin: 0 auto 12px;
+            max-width: 700px;
+            color: #0b1f3a;
+            font-size: clamp(30px, 5vw, 48px);
+            line-height: 1.12;
+            letter-spacing: -1px;
+        }
+
+        .hero h1 span {
+            color: #1769ff;
+        }
+
+        .hero-description {
+            max-width: 520px;
+            margin: 0 auto;
+            color: #5b667a;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* BUTTONS */
+
+        .hero-buttons {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 17px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 11px 19px;
+            border-radius: 11px;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            color: #ffffff;
+            background: #1769ff;
+            border: 1px solid #1769ff;
+        }
+
+        .btn-secondary {
+            color: #0b1f3a;
+            background: #ffffff;
+            border: 1px solid #d6deeb;
+        }
+
+        /* FEATURE CARDS */
+
+        .features {
+            width: 100%;
+            max-width: 850px;
+            margin: 23px auto 0;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            text-align: left;
+        }
+
+        .feature-card {
+            min-width: 0;
+            padding: 15px 12px;
+            background: #ffffff;
+            border: 1px solid #e5ebf4;
+            border-radius: 15px;
+            box-shadow: 0 5px 18px rgba(11, 31, 58, 0.05);
+        }
+
+        .feature-icon {
+            width: 39px;
+            height: 39px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: #eaf3ff;
+            font-size: 21px;
+        }
+
+        .feature-card h3 {
+            margin: 11px 0 5px;
+            color: #0b1f3a;
+            font-size: 14px;
+        }
+
+        .feature-card p {
+            margin: 0;
+            color: #647087;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        /* SHORT TAGLINE */
+
+        .tagline {
+            margin: 18px 0 0;
+            color: #647087;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* FOOTER */
+
+        .footer {
+            padding: 12px 10px;
+            background: #07172c;
+            color: #dce7f8;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 8px;
+        }
+
+        .footer-links a {
+            color: #dce7f8;
+            font-size: 11px;
+            text-decoration: none;
+        }
+
+        .footer-links a:hover {
+            color: #35e0d0;
+        }
+
+        .copyright {
+            margin: 0;
+            color: #a9b8cd;
+            font-size: 10px;
+        }
+
+        /* SMALL SCREENS */
+
+        @media (max-width: 600px) {
+            .landing-navbar {
+                min-height: 57px;
+                padding: 7px 12px;
+                gap: 6px;
+            }
+
+            .landing-logo {
+                gap: 6px;
+                font-size: 18px;
+            }
+
+            .landing-logo-icon {
+                width: 35px;
+                height: 35px;
+            }
+
+            .landing-nav-actions {
+                gap: 6px;
+            }
+
+            .landing-nav-actions a {
+                padding: 9px 10px;
+                font-size: 12px;
+            }
+
+            .hero {
+                padding: 24px 14px 16px;
+            }
+
+            .hero h1 {
+                font-size: clamp(29px, 8vw, 40px);
+            }
+
+            .hero-description {
+                max-width: 390px;
+                font-size: 13px;
+            }
+
+            .features {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+                margin-top: 20px;
+            }
+
+            .feature-card {
+                padding: 12px;
+            }
+
+            .feature-card h3 {
+                margin-top: 8px;
+                font-size: 13px;
+            }
+
+            .feature-card p {
+                font-size: 11px;
+            }
+
+            .feature-icon {
+                width: 34px;
+                height: 34px;
+                font-size: 19px;
+            }
+
+            .tagline {
+                margin-top: 13px;
+            }
+
+            .footer {
+                padding: 10px 8px;
+            }
+
+            .footer-links {
+                gap: 12px;
+                margin-bottom: 7px;
+            }
+        }
+
+        /* SHORT PHONE SCREENS */
+
+        @media (max-height: 700px) {
+            .hero {
+                padding-top: 12px;
+                padding-bottom: 10px;
+            }
+
+            .hero h1 {
+                font-size: clamp(27px, 5vw, 36px);
+                margin-bottom: 8px;
+            }
+
+            .hero-buttons {
+                margin-top: 11px;
+            }
+
+            .btn {
+                min-height: 37px;
+                padding: 9px 15px;
+            }
+
+            .features {
+                margin-top: 13px;
+                gap: 8px;
+            }
+
+            .feature-card {
+                padding: 9px;
+            }
+
+            .feature-icon {
+                width: 30px;
+                height: 30px;
+                font-size: 17px;
+            }
+
+            .feature-card h3 {
+                margin-top: 6px;
+                font-size: 12px;
+            }
+
+            .feature-card p {
+                font-size: 10px;
+                line-height: 1.35;
+            }
+
+            .tagline {
+                margin-top: 9px;
+            }
+
+            .footer {
+                padding: 8px;
+            }
+        }
+
+        /* EXTRA NARROW PHONES */
+
+        @media (max-width: 350px) {
+            .landing-logo {
+                font-size: 16px;
+            }
+
+            .landing-nav-actions a {
+                padding: 8px;
+                font-size: 11px;
+            }
+
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .features {
+                gap: 7px;
+            }
+
+            .feature-card {
+                padding: 9px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="landing-page">
+
+    <!-- NAVIGATION -->
+
+    <header class="landing-navbar">
+
+        <a href="index.html" class="landing-logo">
+
+            <span class="landing-logo-icon">
+                <img
+                    src="faithcircle-logo.svg"
+                    alt="FaithCircle logo"
+                    class="brand-logo-image"
+                >
+            </span>
+
+            <span>FaithCircle</span>
+
+        </a>
+
+        <nav class="landing-nav-actions" aria-label="Main navigation">
+
+            <a href="login.html" class="landing-login">
+                Log In
+            </a>
+
+            <a href="register.html" class="landing-register">
+                Join Now
+            </a>
+
+        </nav>
+
+    </header>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main>
+
+        <section class="hero">
+
+            <h1>
+                Connect with people.<br>
+                <span>Share your world.</span>
+            </h1>
+
+            <p class="hero-description">
+                Meet friends, share photos and videos, send messages,
+                and bring your communities together.
+            </p>
+
+            <div class="hero-buttons">
+
+                <a href="register.html" class="btn btn-primary">
+                    Create Account
+                </a>
+
+                <a href="login.html" class="btn btn-secondary">
+                    Log In
+                </a>
+
+            </div>
+
+
+            <!-- FEATURES -->
+
+            <div class="features">
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">🌍</div>
+
+                    <h3>Social Feed</h3>
+
+                    <p>
+                        Share thoughts, photos, videos,
+                        and everyday moments.
+                    </p>
+
+                </div>
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">💬</div>
+
+                    <h3>Instant Chat</h3>
+
+                    <p>
+                        Stay connected with friends
+                        through messaging.
+                    </p>
+
+                </div>
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">🎤</div>
+
+                    <h3>Voice Messages</h3>
+
+                    <p>
+                        Share your voice with
+                        friends and family.
+                    </p>
+
+                </div>
+
+
+                <div class="feature-card">
+
+                    <div class="feature-icon">👥</div>
+
+                    <h3>Group Chats</h3>
+
+                    <p>
+                        Bring your people together
+                        in group conversations.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <p class="tagline">
+                Connect. Communicate. Share.
+            </p>
+
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer class="footer">
+
+        <div class="footer-links">
+
+            <a href="index.html">Home</a>
+
+            <a href="videos.html">Videos</a>
+
+            <a href="terms.html">Terms</a>
+
+            <a href="privacy.html">Privacy</a>
+
+        </div>
+
+        <p class="copyright">
+            &copy; <span id="currentYear"></span> FaithCircle.
+            All rights reserved.
+        </p>
+
+    </footer>
+
+</div>
+
+
+<!-- JAVASCRIPT -->
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const yearElement = document.getElementById("currentYear");
+
+        if (yearElement) {
+            yearElement.textContent = new Date().getFullYear();
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1f3a">
+
+    <title>User Profile | FaithCircle</title>
+
+    <link rel="stylesheet" href="global.css">
+
+    <style>
+        .user-profile-page {
+            width: min(100% - 24px, 850px);
+            margin: 24px auto;
+            color: #0b1f3a;
+        }
+
+        .profile-card {
+            background: #ffffff;
+            border: 1px solid rgba(11, 31, 58, 0.12);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(11, 31, 58, 0.08);
+        }
+
+        .profile-cover {
+            height: 220px;
+            background: #0b1f3a;
+            background-position: center;
+            background-size: cover;
+        }
+
+        .profile-main {
+            padding: 0 24px 28px;
+        }
+
+        .profile-avatar {
+            width: 132px;
+            height: 132px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #35e0d0;
+            border: 5px solid #ffffff;
+            margin-top: -66px;
+            position: relative;
+        }
+
+        .profile-name {
+            margin: 14px 0 4px;
+            font-size: 27px;
+            overflow-wrap: anywhere;
+        }
+
+        .profile-username {
+            margin: 0 0 14px;
+            opacity: 0.7;
+        }
+
+        .profile-bio {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            line-height: 1.7;
+            margin: 16px 0;
+        }
+
+        .profile-details {
+            display: grid;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .profile-detail {
+            padding: 12px 14px;
+            background: rgba(53, 224, 208, 0.12);
+            border-radius: 10px;
+            overflow-wrap: anywhere;
+        }
+
+        .profile-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .profile-action-button {
+            border: 1px solid #35e0d0;
+            background: #35e0d0;
+            color: #0b1f3a;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .profile-action-button:hover {
+            background: #0b1f3a;
+            color: #ffffff;
+        }
+
+        .profile-action-button:disabled { opacity: .7; cursor: wait; }
+        .profile-message {
+            text-align: center;
+            padding: 45px 18px;
+            color: #0b1f3a;
+        }
+
+        .profile-message button {
+            margin-top: 14px;
+            padding: 11px 18px;
+            background: #35e0d0;
+            color: #0b1f3a;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .profile-section {
+            margin-top: 18px;
+            padding: 20px;
+            background: #ffffff;
+            border: 1px solid rgba(11, 31, 58, 0.12);
+            border-radius: 14px;
+        }
+
+        .profile-section h2 {
+            margin-top: 0;
+            font-size: 19px;
+        }
+
+        .profile-link {
+            color: #0b1f3a;
+            overflow-wrap: anywhere;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        @media (max-width: 600px) {
+            .user-profile-page {
+                width: calc(100% - 16px);
+                margin: 12px auto;
+            }
+
+            .profile-cover {
+                height: 160px;
+            }
+
+            .profile-main {
+                padding: 0 16px 22px;
+            }
+
+            .profile-avatar {
+                width: 105px;
+                height: 105px;
+                margin-top: -52px;
+            }
+
+            .profile-name {
+                font-size: 23px;
+            }
+
+            .profile-action-button {
+                flex: 1 1 130px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="user-profile-page">
+
+        <div
+            id="profileMessage"
+            class="profile-card profile-message"
+        >
+            <p>Loading profile...</p>
+        </div>
+
+        <div id="profileContent" hidden>
+
+            <section class="profile-card">
+
+                <div
+                    id="profileCover"
+                    class="profile-cover"
+                ></div>
+
+                <div class="profile-main">
+
+                    <img
+                        id="profileAvatar"
+                        class="profile-avatar"
+                        alt="User profile picture"
+                    >
+
+                    <h1
+                        id="profileName"
+                        class="profile-name"
+                    ></h1>
+
+                    <p
+                        id="profileUsername"
+                        class="profile-username"
+                    ></p>
+
+                    <p
+                        id="profileBio"
+                        class="profile-bio"
+                    ></p>
+
+                    <div
+                        id="profileActions"
+                        class="profile-actions"
+                    ></div>
+
+                    <div
+                        id="profileDetails"
+                        class="profile-details"
+                    ></div>
+
+                </div>
+            </section>
+
+            <section
+                id="socialLinksSection"
+                class="profile-section"
+                hidden
+            >
+                <h2>Social links</h2>
+
+                <div id="socialLinks"></div>
+            </section>
+
+        </div>
+
+    </main>
+
+    <!-- Supabase library -->
+    <script src="faithcircle-moderation.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Your existing Supabase configuration -->
+    <script src="supabase-config.js"></script>
+  <script src="FaithCircle-live-enhancements.js" defer></script>
+
+    <script>
+        (() => {
+            "use strict";
+
+            const messageBox =
+                document.getElementById("profileMessage");
+
+            const profileContent =
+                document.getElementById("profileContent");
+
+            const params =
+                new URLSearchParams(window.location.search);
+
+            const targetUserId = params.get("id");
+
+            const fallbackAvatar =
+                "data:image/svg+xml;charset=UTF-8," +
+                encodeURIComponent(`
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="160" height="160">
+                        <rect width="100%" height="100%"
+                              fill="#35e0d0"/>
+                        <circle cx="80" cy="58" r="28"
+                                fill="#0b1f3a"/>
+                        <path d="M25 150 Q25 100 80 100
+                                 Q135 100 135 150"
+                              fill="#0b1f3a"/>
+                    </svg>
+                `);
+
+            function showMessage(text, showBack = false) {
+                messageBox.replaceChildren();
+
+                const paragraph = document.createElement("p");
+                paragraph.textContent = text;
+
+                messageBox.appendChild(paragraph);
+
+                if (showBack) {
+                    const backButton =
+                        document.createElement("button");
+
+                    backButton.type = "button";
+                    backButton.textContent = "Go Back";
+
+                    backButton.addEventListener("click", () => {
+                        window.history.back();
+                    });
+
+                    messageBox.appendChild(backButton);
+                }
+
+                messageBox.hidden = false;
+                profileContent.hidden = true;
+            }
+
+            function addDetail(label, value) {
+                if (
+                    value === null ||
+                    value === undefined ||
+                    String(value).trim() === ""
+                ) {
+                    return;
+                }
+
+                const row = document.createElement("div");
+                row.className = "profile-detail";
+
+                const strong = document.createElement("strong");
+                strong.textContent = label + ": ";
+
+                const text = document.createElement("span");
+
+                text.textContent = Array.isArray(value)
+                    ? value.join(", ")
+                    : String(value);
+
+                row.append(strong, text);
+
+                document
+                    .getElementById("profileDetails")
+                    .appendChild(row);
+            }
+
+            function addSocialLink(label, url) {
+                if (!url) return;
+
+                try {
+                    const parsed = new URL(url);
+
+                    if (
+                        !["https:", "http:"].includes(parsed.protocol)
+                    ) {
+                        return;
+                    }
+
+                    const paragraph = document.createElement("p");
+                    const link = document.createElement("a");
+
+                    link.className = "profile-link";
+                    link.href = parsed.href;
+                    link.target = "_blank";
+                    link.rel = "noopener noreferrer";
+                    link.textContent = label;
+
+                    paragraph.appendChild(link);
+
+                    document
+                        .getElementById("socialLinks")
+                        .appendChild(paragraph);
+
+                    document.getElementById(
+                        "socialLinksSection"
+                    ).hidden = false;
+
+                } catch (error) {
+                    console.warn("Invalid social link:", label);
+                }
+            }
+
+            function addAction(label, onClick) {
+                const button = document.createElement("button");
+
+                button.type = "button";
+                button.className = "profile-action-button";
+                button.textContent = label;
+
+                button.addEventListener("click", onClick);
+
+                document
+                    .getElementById("profileActions")
+                    .appendChild(button);
+            }
+
+            async function loadProfile() {
+                if (!targetUserId) {
+                    showMessage(
+                        "No user was selected. Open a profile from a user link.",
+                        true
+                    );
+
+                    return;
+                }
+
+                const uuidPattern =
+                    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+                if (!uuidPattern.test(targetUserId)) {
+                    showMessage("The profile link is invalid.", true);
+                    return;
+                }
+
+                /*
+                 * IMPORTANT:
+                 * Use the client variable already created
+                 * by your supabase-config.js.
+                 */
+
+                const client =
+                    window.supabaseClient ||
+                    window._supabase;
+
+                if (!client || typeof client.from !== "function") {
+                    showMessage(
+                        "Supabase is not initialized. Check supabase-config.js.",
+                        true
+                    );
+
+                    return;
+                }
+
+                try {
+                    const {
+                        data: { user },
+                        error: authError
+                    } = await client.auth.getUser();
+
+                    if (authError) {
+                        console.warn(
+                            "Authentication check:",
+                            authError.message
+                        );
+                    }
+
+                    const { data: profile, error } = await client
+                        .from("profiles")
+                        .select(`
+                            id,
+                            username,
+                            full_name,
+                            bio,
+                            avatar_url,
+                            cover_url,
+                            location,
+                            occupation,
+                            employer,
+                            education,
+                            skills,
+                            interests,
+                            languages,
+                            website,
+                            linkedin_url,
+                            facebook_url,
+                            instagram_url,
+                            x_url,
+                            youtube_url
+                        `)
+                        .eq("id", targetUserId)
+                        .maybeSingle();
+
+                    if (error) {
+                        console.error(
+                            "Profile loading error:",
+                            error
+                        );
+
+                        showMessage(
+                            "We couldn't load this profile. Check your connection and Supabase profile-reading permissions.",
+                            true
+                        );
+
+                        return;
+                    }
+
+                    if (!profile) {
+                        showMessage(
+                            "This profile does not exist or is not available to you.",
+                            true
+                        );
+
+                        return;
+                    }
+
+                    document.title =
+                        (profile.full_name ||
+                         profile.username ||
+                         "User") +
+                        " | FaithCircle";
+
+                    document.getElementById(
+                        "profileName"
+                    ).textContent =
+                        profile.full_name ||
+                        profile.username ||
+                        "FaithCircle member";
+
+                    document.getElementById(
+                        "profileUsername"
+                    ).textContent =
+                        profile.username
+                            ? "@" + profile.username
+                            : "";
+
+                    document.getElementById(
+                        "profileBio"
+                    ).textContent =
+                        profile.bio ||
+                        "This user hasn't added a bio yet.";
+
+                    const avatar =
+                        document.getElementById("profileAvatar");
+
+                    avatar.src =
+                        profile.avatar_url || fallbackAvatar;
+
+                    avatar.alt =
+                        (profile.full_name || "User") +
+                        "'s profile picture";
+
+                    avatar.onerror = () => {
+                        avatar.onerror = null;
+                        avatar.src = fallbackAvatar;
+                    };
+
+                    const cover =
+                        document.getElementById("profileCover");
+
+                    if (profile.cover_url) {
+                        try {
+                            const coverUrl = new URL(profile.cover_url);
+
+                            if (
+                                ["https:", "http:"].includes(
+                                    coverUrl.protocol
+                                )
+                            ) {
+                                cover.style.backgroundImage =
+                                    `url("${coverUrl.href.replace(/["\\]/g, "")}")`;
+                            }
+                        } catch (error) {
+                            console.warn("Invalid cover image URL.");
+                        }
+                    }
+
+                    document.getElementById(
+                        "profileDetails"
+                    ).replaceChildren();
+
+                    addDetail("Location", profile.location);
+                    addDetail("Occupation", profile.occupation);
+                    addDetail("Employer", profile.employer);
+                    addDetail("Education", profile.education);
+                    addDetail("Skills", profile.skills);
+                    addDetail("Interests", profile.interests);
+                    addDetail("Languages", profile.languages);
+
+                    document.getElementById(
+                        "socialLinks"
+                    ).replaceChildren();
+
+                    document.getElementById(
+                        "socialLinksSection"
+                    ).hidden = true;
+
+                    addSocialLink("Website", profile.website);
+                    addSocialLink("LinkedIn", profile.linkedin_url);
+                    addSocialLink("Facebook", profile.facebook_url);
+                    addSocialLink("Instagram", profile.instagram_url);
+                    addSocialLink("X", profile.x_url);
+                    addSocialLink("YouTube", profile.youtube_url);
+
+                    const actions =
+                        document.getElementById("profileActions");
+
+                    actions.replaceChildren();
+
+                    if (user && user.id !== profile.id) {
+                        addAction("Message", () => {
+                            window.location.href =
+                                "messages.html?user_id=" +
+                                encodeURIComponent(profile.id);
+                        });
+                        const friendButton = document.createElement("button");
+                        friendButton.type = "button";
+                        friendButton.className = "profile-action-button";
+                        friendButton.textContent = "Add Friend";
+                        friendButton.addEventListener("click", async () => {
+                            friendButton.disabled = true;
+                            try {
+                                const { data: relationship, error: findError } = await client
+                                    .from("friend_requests").select("id,status,requester_id,recipient_id")
+                                    .or(`and(requester_id.eq.${user.id},recipient_id.eq.${profile.id}),and(requester_id.eq.${profile.id},recipient_id.eq.${user.id})`)
+                                    .maybeSingle();
+                                if (findError) throw findError;
+                                if (relationship?.status === "accepted") {
+                                    friendButton.textContent = "✓ Friends";
+                                    return;
+                                }
+                                if (relationship?.status === "pending") {
+                                    friendButton.textContent = relationship.requester_id === user.id ? "Request Sent" : "Request Received";
+                                    return;
+                                }
+                                if (relationship?.status === "rejected") {
+                                    const { error: removeError } = await client.from("friend_requests").delete().eq("id", relationship.id);
+                                    if (removeError) throw removeError;
+                                }
+                                const { error } = await client.from("friend_requests").insert({ requester_id: user.id, recipient_id: profile.id, status: "pending" });
+                                if (error) throw error;
+                                friendButton.textContent = "Request Sent";
+                            } catch (err) {
+                                console.error("Friend request failed", err);
+                                friendButton.disabled = false;
+                                friendButton.textContent = "Add Friend";
+                                alert(err.message || "Could not send friend request. Check your friend_requests table permissions.");
+                            }
+                        });
+                        document.getElementById("profileActions").appendChild(friendButton);
+                    }
+
+                    if (user && user.id === profile.id) {
+                        addAction("Edit My Profile", () => {
+                            window.location.href = "profile.html";
+                        });
+                    }
+
+                    messageBox.hidden = true;
+                    profileContent.hidden = false;
+
+                } catch (error) {
+                    console.error(
+                        "Unexpected profile error:",
+                        error
+                    );
+
+                    showMessage(
+                        "Something went wrong while loading the profile.",
+                        true
+                    );
+                }
+            }
+
+            loadProfile();
+
+        })();
+    </script>
+
+</body>
+</html>

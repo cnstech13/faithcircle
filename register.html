@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1f3a">
+
+    <meta
+        name="description"
+        content="Create your FaithCircle account and connect with friends."
+    >
+
+    <title>Create Account | FaithCircle</title>
+
+    <link rel="stylesheet" href="global.css">
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- FaithCircle Configuration -->
+    <script src="supabase-config.js"></script>
+  <script src="FaithCircle-live-enhancements.js" defer></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body.auth-page {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #172033;
+            background:
+                radial-gradient(
+                    circle at 85% 15%,
+                    rgba(53, 224, 208, 0.12),
+                    transparent 28%
+                ),
+                linear-gradient(145deg, #f4f7fb, #eaf2ff);
+        }
+
+        /* =====================================
+           TOP NAVIGATION
+        ===================================== */
+
+        .register-navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            min-height: 76px;
+            padding: 13px 5%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            background: linear-gradient(
+                120deg,
+                #0b1f3a,
+                #123c70
+            );
+            border-bottom: 3px solid #35e0d0;
+            box-shadow: 0 5px 20px rgba(11, 31, 58, 0.12);
+        }
+
+        .register-brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 11px;
+            color: #ffffff;
+            font-size: 21px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .register-brand-icon {
+            width: 43px;
+            height: 43px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            border-radius: 13px;
+            background: linear-gradient(
+                135deg,
+                #1769ff,
+                #35e0d0
+            );
+            color: #ffffff;
+            font-size: 26px;
+            font-weight: 900;
+        }
+
+        .register-login-button {
+            min-height: 42px;
+            padding: 10px 17px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: 0.2s ease;
+        }
+
+        .register-login-button:hover {
+            background: #35e0d0;
+            color: #0b1f3a;
+        }
+
+        /* =====================================
+           MAIN REGISTRATION AREA
+        ===================================== */
+
+        .register-container {
+            width: 100%;
+            flex: 1;
+            padding: 45px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .register-card {
+            width: 100%;
+            max-width: 510px;
+            padding: 36px;
+            border: 1px solid #e3eaf5;
+            border-radius: 25px;
+            background: #ffffff;
+            box-shadow: 0 20px 65px rgba(11, 31, 58, 0.10);
+        }
+
+        .register-logo {
+            width: 63px;
+            height: 63px;
+            margin: 0 auto 19px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 19px;
+            background: linear-gradient(
+                135deg,
+                #0b1f3a,
+                #1769ff,
+                #35e0d0
+            );
+            color: #ffffff;
+            font-size: 36px;
+            font-weight: 900;
+            box-shadow: 0 9px 22px rgba(23, 105, 255, 0.20);
+        }
+
+        .register-card h1 {
+            margin: 0 0 12px;
+            color: #0b1f3a;
+            text-align: center;
+            font-size: 29px;
+            letter-spacing: -0.6px;
+        }
+
+        .register-description {
+            max-width: 370px;
+            margin: 0 auto 28px;
+            color: #647087;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        /* =====================================
+           FORM FIELDS
+        ===================================== */
+
+        .register-form .form-group {
+            margin-bottom: 19px;
+        }
+
+        .register-form .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #172033;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .register-form .form-group input {
+            width: 100%;
+            min-height: 48px;
+            padding: 12px 14px;
+            border: 1px solid #d8e1ef;
+            border-radius: 12px;
+            outline: none;
+            background: #f9fbff;
+            color: #172033;
+            font-family: inherit;
+            font-size: 14px;
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .register-form .form-group input::placeholder {
+            color: #98a4b7;
+        }
+
+        .register-form .form-group input:focus {
+            border-color: #1769ff;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(23, 105, 255, 0.10);
+        }
+
+        .register-form .form-group small {
+            display: block;
+            margin-top: 7px;
+            color: #77849a;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* =====================================
+           PASSWORD SHOW / HIDE
+        ===================================== */
+
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .password-wrapper input {
+            padding-right: 78px !important;
+        }
+
+        .password-toggle {
+            position: absolute;
+            top: 50%;
+            right: 9px;
+            transform: translateY(-50%);
+            min-height: 34px;
+            padding: 7px 9px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: #1769ff;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .password-toggle:hover {
+            background: #eaf3ff;
+        }
+
+        .password-toggle:focus-visible {
+            outline: 2px solid #1769ff;
+            outline-offset: 2px;
+        }
+
+        /* =====================================
+           TERMS AND CONDITIONS
+        ===================================== */
+
+        .terms-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 21px 0;
+            color: #647087;
+            font-size: 13px;
+            line-height: 1.8;
+            cursor: pointer;
+        }
+
+        .terms-label input {
+            width: 17px;
+            height: 17px;
+            margin: 3px 0 0;
+            flex-shrink: 0;
+            accent-color: #1769ff;
+            cursor: pointer;
+        }
+
+        .terms-label a {
+            color: #1769ff;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .terms-label a:hover {
+            text-decoration: underline;
+        }
+
+        /* =====================================
+           CREATE ACCOUNT BUTTON
+        ===================================== */
+
+        .register-button {
+            width: 100%;
+            min-height: 51px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 18px;
+            border: none;
+            border-radius: 13px;
+            background: linear-gradient(
+                110deg,
+                #1769ff,
+                #1254d9
+            );
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 7px 18px rgba(23, 105, 255, 0.20);
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .register-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 11px 25px rgba(23, 105, 255, 0.27);
+        }
+
+        .register-button:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        /* =====================================
+           STATUS MESSAGE
+        ===================================== */
+
+        .form-message {
+            margin: 14px 0 0;
+            text-align: center;
+            font-size: 13px;
+            line-height: 1.7;
+            overflow-wrap: anywhere;
+        }
+
+        .form-message:empty {
+            display: none;
+        }
+
+        .form-message.error {
+            color: #dc2626;
+        }
+
+        .form-message.success {
+            color: #15803d;
+        }
+
+        /* =====================================
+           LOGIN LINK
+        ===================================== */
+
+        .register-auth-switch {
+            margin-top: 25px;
+            padding-top: 21px;
+            border-top: 1px solid #edf1f7;
+            color: #647087;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .register-auth-switch a {
+            color: #1769ff;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .register-auth-switch a:hover {
+            text-decoration: underline;
+        }
+
+        /* =====================================
+           FOOTER
+        ===================================== */
+
+        .register-footer {
+            padding: 20px 15px;
+            background: #07172c;
+            color: #a9b8cd;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .register-footer p {
+            margin: 0;
+        }
+
+        /* =====================================
+           MOBILE RESPONSIVENESS
+        ===================================== */
+
+        @media (max-width: 520px) {
+            .register-navbar {
+                min-height: 68px;
+                padding: 11px 14px;
+                gap: 9px;
+            }
+
+            .register-brand {
+                gap: 8px;
+                font-size: 17px;
+            }
+
+            .register-brand-icon {
+                width: 38px;
+                height: 38px;
+                border-radius: 11px;
+                font-size: 23px;
+            }
+
+            .register-login-button {
+                min-height: 39px;
+                padding: 9px 12px;
+                border-radius: 10px;
+                font-size: 12px;
+            }
+
+            .register-container {
+                align-items: flex-start;
+                padding: 30px 13px;
+            }
+
+            .register-card {
+                padding: 27px 20px;
+                border-radius: 21px;
+            }
+
+            .register-logo {
+                width: 57px;
+                height: 57px;
+                border-radius: 17px;
+                font-size: 32px;
+                margin-bottom: 17px;
+            }
+
+            .register-card h1 {
+                font-size: 26px;
+            }
+
+            .register-description {
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 350px) {
+            .register-navbar {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .register-card {
+                padding: 24px 15px;
+            }
+        }
+    </style>
+</head>
+
+<body class="auth-page">
+
+    <!-- TOP NAVIGATION -->
+    <header class="register-navbar">
+
+        <a href="index.html" class="register-brand">
+            <span class="register-brand-icon"><img src="faithcircle-logo.svg" alt="FaithCircle logo" class="brand-logo-image"></span>
+            <span>FaithCircle</span>
+        </a>
+
+        <a href="login.html" class="register-login-button">
+            Log In
+        </a>
+
+    </header>
+
+    <!-- REGISTRATION SECTION -->
+    <main class="register-container">
+
+        <section class="register-card">
+
+            <div class="register-logo" aria-hidden="true"><img src="faithcircle-logo.svg" alt="FaithCircle logo" class="brand-logo-image"></div>
+
+            <h1>Create Your Account</h1>
+
+            <p class="register-description">
+                Join FaithCircle to share moments, message friends,
+                and build your community.
+            </p>
+
+            <form id="registerForm" class="register-form">
+
+                <!-- FULL NAME -->
+                <div class="form-group">
+
+                    <label for="fullName">Full Name</label>
+
+                    <input
+                        type="text"
+                        id="fullName"
+                        name="fullName"
+                        placeholder="Enter your full name"
+                        autocomplete="name"
+                        maxlength="100"
+                        required
+                    >
+
+                </div>
+
+                <!-- USERNAME -->
+                <div class="form-group">
+
+                    <label for="username">Username</label>
+
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Choose a username"
+                        autocomplete="username"
+                        minlength="3"
+                        maxlength="20"
+                        pattern="[A-Za-z0-9_]+"
+                        title="Use only letters, numbers, and underscores."
+                        required
+                    >
+
+                    <small>
+                        Use 3–20 characters: letters, numbers, and underscores.
+                    </small>
+
+                </div>
+
+                <!-- EMAIL -->
+                <div class="form-group">
+
+                    <label for="email">Email Address</label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email address"
+                        autocomplete="email"
+                        maxlength="254"
+                        required
+                    >
+
+                </div>
+
+                <!-- PASSWORD -->
+                <div class="form-group">
+
+                    <label for="password">Password</label>
+
+                    <div class="password-wrapper">
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Create a password"
+                            autocomplete="new-password"
+                            minlength="8"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            data-target="password"
+                            aria-controls="password"
+                            aria-pressed="false"
+                        >
+                            Show
+                        </button>
+
+                    </div>
+
+                    <small>
+                        Your password must contain at least 8 characters.
+                    </small>
+
+                </div>
+
+                <!-- CONFIRM PASSWORD -->
+                <div class="form-group">
+
+                    <label for="confirmPassword">
+                        Confirm Password
+                    </label>
+
+                    <div class="password-wrapper">
+
+                        <input
+                            type="password"
+                            id="confirmPassword"
+                            name="confirmPassword"
+                            placeholder="Enter your password again"
+                            autocomplete="new-password"
+                            minlength="8"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="password-toggle"
+                            data-target="confirmPassword"
+                            aria-controls="confirmPassword"
+                            aria-pressed="false"
+                        >
+                            Show
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <!-- TERMS -->
+                <label class="terms-label">
+
+                    <input
+                        type="checkbox"
+                        id="acceptTerms"
+                        required
+                    >
+
+                    <span>
+                        I agree to the FaithCircle
+                        <a href="terms.html">Terms of Service</a>
+                        and
+                        <a href="privacy.html">Privacy Policy</a>.
+                    </span>
+
+                </label>
+
+                <!-- REGISTER BUTTON -->
+                <button
+                    type="submit"
+                    class="register-button"
+                    id="registerButton"
+                >
+                    Create Account
+                </button>
+
+                <!-- STATUS -->
+                <p
+                    id="formMessage"
+                    class="form-message"
+                    role="status"
+                    aria-live="polite"
+                ></p>
+
+            </form>
+
+            <div class="register-auth-switch">
+                Already have an account?
+                <a href="login.html">Log In</a>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="register-footer">
+
+        <p>
+            &copy; <span id="currentYear"></span>
+            FaithCircle. All rights reserved.
+        </p>
+
+    </footer>
+
+    <script>
+        // =========================================
+        // FaithCircle - REGISTRATION
+        // =========================================
+
+        const registerForm =
+            document.getElementById("registerForm");
+
+        const fullNameInput =
+            document.getElementById("fullName");
+
+        const usernameInput =
+            document.getElementById("username");
+
+        const emailInput =
+            document.getElementById("email");
+
+        const passwordInput =
+            document.getElementById("password");
+
+        const confirmPasswordInput =
+            document.getElementById("confirmPassword");
+
+        const acceptTermsInput =
+            document.getElementById("acceptTerms");
+
+        const registerButton =
+            document.getElementById("registerButton");
+
+        const formMessage =
+            document.getElementById("formMessage");
+
+
+        // =========================================
+        // CURRENT YEAR
+        // =========================================
+
+        document.getElementById("currentYear").textContent =
+            new Date().getFullYear();
+
+
+        // =========================================
+        // SHOW / HIDE PASSWORDS
+        // =========================================
+
+        document.querySelectorAll(".password-toggle").forEach(
+            function (button) {
+
+                button.addEventListener("click", function () {
+
+                    const input = document.getElementById(
+                        button.dataset.target
+                    );
+
+                    const shouldShow =
+                        input.type === "password";
+
+                    input.type = shouldShow ? "text" : "password";
+
+                    button.textContent =
+                        shouldShow ? "Hide" : "Show";
+
+                    button.setAttribute(
+                        "aria-pressed",
+                        String(shouldShow)
+                    );
+
+                });
+
+            }
+        );
+
+
+        // =========================================
+        // DISPLAY MESSAGE
+        // =========================================
+
+        function showMessage(message, type) {
+
+            formMessage.textContent = message;
+
+            formMessage.classList.remove(
+                "error",
+                "success"
+            );
+
+            if (type) {
+                formMessage.classList.add(type);
+            }
+
+        }
+
+
+        // =========================================
+        // GET SUPABASE CLIENT
+        // =========================================
+
+        function getSupabaseClient() {
+
+            if (window.supabaseClient) {
+                return window.supabaseClient;
+            }
+
+            if (
+                window.CNS_SUPABASE &&
+                window.CNS_SUPABASE.auth
+            ) {
+                return window.CNS_SUPABASE;
+            }
+
+            return null;
+
+        }
+
+
+        // =========================================
+        // REGISTER USER
+        // =========================================
+
+        registerForm.addEventListener(
+            "submit",
+            async function (event) {
+
+                event.preventDefault();
+
+                showMessage("", "");
+
+                const supabase = getSupabaseClient();
+
+                if (!supabase) {
+
+                    showMessage(
+                        "Supabase is not connected. Check supabase-config.js.",
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+                const fullName =
+                    fullNameInput.value.trim();
+
+                const username =
+                    usernameInput.value.trim().toLowerCase();
+
+                const email =
+                    emailInput.value.trim();
+
+                const password =
+                    passwordInput.value;
+
+                const confirmPassword =
+                    confirmPasswordInput.value;
+
+
+                // Validate full name
+
+                if (fullName.length < 2) {
+
+                    showMessage(
+                        "Please enter your full name.",
+                        "error"
+                    );
+
+                    fullNameInput.focus();
+                    return;
+
+                }
+
+
+                // Validate username
+
+                const usernamePattern =
+                    /^[a-zA-Z0-9_]{3,20}$/;
+
+                if (!usernamePattern.test(username)) {
+
+                    showMessage(
+                        "Your username must be 3–20 characters and contain only letters, numbers, or underscores.",
+                        "error"
+                    );
+
+                    usernameInput.focus();
+                    return;
+
+                }
+
+
+                // Validate password
+
+                if (password.length < 8) {
+
+                    showMessage(
+                        "Your password must contain at least 8 characters.",
+                        "error"
+                    );
+
+                    passwordInput.focus();
+                    return;
+
+                }
+
+
+                // Confirm password
+
+                if (password !== confirmPassword) {
+
+                    showMessage(
+                        "Your passwords do not match.",
+                        "error"
+                    );
+
+                    confirmPasswordInput.focus();
+                    return;
+
+                }
+
+
+                // Terms and conditions
+
+                if (!acceptTermsInput.checked) {
+
+                    showMessage(
+                        "Please accept the Terms of Service and Privacy Policy.",
+                        "error"
+                    );
+
+                    return;
+
+                }
+
+
+                // Prevent duplicate submissions
+
+                registerButton.disabled = true;
+
+                registerButton.textContent =
+                    "Creating Account...";
+
+
+                try {
+
+                    /*
+                     Save full name and username as Supabase
+                     Auth user metadata.
+
+                     This preserves the existing registration
+                     approach. It does not itself create a row
+                     in the public profiles table.
+                    */
+
+                    const { data, error } =
+                        await supabase.auth.signUp({
+
+                            email: email,
+
+                            password: password,
+
+                            options: {
+
+                                data: {
+                                    full_name: fullName,
+                                    username: username
+                                },
+
+                                emailRedirectTo: new URL(
+                                    "login.html",
+                                    window.location.href
+                                ).href
+
+                            }
+
+                        });
+
+
+                    if (error) {
+                        throw error;
+                    }
+
+
+                    // Detect a potentially existing account
+
+                    if (
+                        data.user &&
+                        data.user.identities &&
+                        data.user.identities.length === 0
+                    ) {
+
+                        showMessage(
+                            "An account may already exist for this email. Try logging in or resetting your password.",
+                            "error"
+                        );
+
+                        return;
+
+                    }
+
+
+                    // Email confirmation is required
+
+                    if (
+                        data.user &&
+                        !data.session
+                    ) {
+
+                        showMessage(
+                            "Registration received! Check your email for a confirmation link before logging in.",
+                            "success"
+                        );
+
+                        if (typeof Swal !== "undefined") {
+
+                            await Swal.fire({
+                                icon: "success",
+                                title: "Check Your Email",
+                                text: "Open the confirmation email from Supabase to activate your account.",
+                                confirmButtonColor: "#1769ff"
+                            });
+
+                        }
+
+                        registerForm.reset();
+
+                        return;
+
+                    }
+
+
+                    // Account created with an active session
+
+                    showMessage(
+                        "Your account has been created successfully!",
+                        "success"
+                    );
+
+                    if (typeof Swal !== "undefined") {
+
+                        await Swal.fire({
+                            icon: "success",
+                            title: "Welcome to FaithCircle!",
+                            text: "Your account has been created successfully. You can now log in.",
+                            confirmButtonColor: "#1769ff"
+                        });
+
+                    }
+
+                    window.location.href = "login.html";
+
+
+                } catch (error) {
+
+                    console.error(
+                        "FaithCircle registration error:",
+                        error
+                    );
+
+                    showMessage(
+                        error.message ||
+                        "Registration failed. Please try again.",
+                        "error"
+                    );
+
+                } finally {
+
+                    registerButton.disabled = false;
+
+                    registerButton.textContent =
+                        "Create Account";
+
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+</html>

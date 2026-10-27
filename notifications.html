@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Notifications | FaithCircle</title>
+
+    <link rel="stylesheet" href="global.css">
+
+    <script src="faithcircle-moderation.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="supabase-config.js"></script>
+  <script src="FaithCircle-live-enhancements.js" defer></script>
+
+    <style>
+        :root {
+            --navy: #0b1f3a;
+            --blue: #2563eb;
+            --aqua: #35e0d0;
+            --background: #f3f6fb;
+            --border: #e5e7eb;
+            --muted: #64748b;
+            --white: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--background);
+            color: #172033;
+            font-family: Arial, sans-serif;
+        }
+
+        button {
+            font: inherit;
+            cursor: pointer;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        /* TOP NAVIGATION */
+
+        .cns-app-nav {
+            background: var(--navy);
+            color: white;
+            padding: 12px 18px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .cns-nav-top {
+            max-width: 1200px;
+            margin: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .cns-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+        }
+
+        .cns-brand-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            background: linear-gradient(
+                135deg,
+                var(--blue),
+                var(--aqua)
+            );
+            color: var(--navy);
+            display: grid;
+            place-items: center;
+            font-size: 23px;
+            font-weight: 900;
+        }
+
+        .cns-brand-text {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .cns-brand-text strong {
+            font-size: 16px;
+        }
+
+        .cns-brand-text small {
+            font-size: 11px;
+            color: #cbd5e1;
+        }
+
+        .cns-nav-account {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cns-nav-link,
+        .cns-signout-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            border: 0;
+            border-radius: 9px;
+            padding: 10px 12px;
+            color: #e2e8f0;
+            background: transparent;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .cns-nav-link:hover,
+        .cns-signout-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .cns-nav-link.active {
+            background: var(--blue);
+            color: white;
+        }
+
+        .cns-nav-link svg,
+        .cns-signout-button svg {
+            width: 19px;
+            height: 19px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .cns-signout-button {
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .cns-nav-links {
+            max-width: 1200px;
+            margin: 12px auto 0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            overflow-x: auto;
+        }
+
+        /* MAIN PAGE */
+
+        .notifications-page {
+            width: 100%;
+            max-width: 850px;
+            margin: 25px auto;
+            padding: 0 14px 35px;
+        }
+
+        .heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .heading h1 {
+            margin: 0 0 6px;
+            font-size: 27px;
+            color: var(--navy);
+        }
+
+        .heading p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .mark-all {
+            border: none;
+            background: var(--blue);
+            color: white;
+            padding: 11px 14px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .mark-all:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .summary {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .summary strong {
+            font-size: 15px;
+            color: var(--navy);
+        }
+
+        .unread-count {
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 6px 11px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .notification-list {
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+        }
+
+        .notification {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 13px;
+        }
+
+        .notification.unread {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            border-left: 4px solid var(--blue);
+        }
+
+        .notification-icon {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 13px;
+            background: #e8eefc;
+            font-size: 21px;
+        }
+
+        .notification-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-message {
+            margin: 1px 0 8px;
+            line-height: 1.6;
+            font-size: 14px;
+            overflow-wrap: anywhere;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .notification-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .action-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--navy);
+            padding: 8px 11px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .loading,
+        .empty-state,
+        .error-state {
+            text-align: center;
+            padding: 40px 18px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .loading {
+            color: var(--muted);
+        }
+
+        .empty-icon {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .empty-state h3,
+        .error-state h3 {
+            color: var(--navy);
+        }
+
+        .empty-state p,
+        .error-state p {
+            color: var(--muted);
+            line-height: 1.7;
+            overflow-wrap: anywhere;
+        }
+
+        .retry-button {
+            background: var(--blue);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .load-more-container {
+            text-align: center;
+            padding: 22px 0;
+        }
+
+        .load-more {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--navy);
+            padding: 11px 22px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--blue);
+            margin-left: 5px;
+        }
+
+        @media (max-width: 650px) {
+            .cns-app-nav {
+                padding: 10px;
+            }
+
+            .cns-brand-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            .cns-brand-text strong {
+                font-size: 14px;
+            }
+
+            .cns-brand-text small {
+                font-size: 10px;
+            }
+
+            .cns-nav-account span {
+                display: none;
+            }
+
+            .cns-nav-links {
+                margin-top: 10px;
+            }
+
+            .notifications-page {
+                margin-top: 15px;
+                padding: 0 9px 25px;
+            }
+
+            .heading h1 {
+                font-size: 23px;
+            }
+
+            .notification {
+                padding: 12px;
+                gap: 9px;
+            }
+
+            .notification-icon {
+                width: 37px;
+                height: 37px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="cns-app-nav">
+
+    <div class="cns-nav-top">
+
+        <a href="dashboard.html" class="cns-brand">
+            <span class="cns-brand-icon"><img src="faithcircle-logo.svg" alt="FaithCircle logo" class="brand-logo-image"></span>
+
+            <span class="cns-brand-text">
+                <strong>FaithCircle</strong>
+                <small>Connect. Encourage. Grow in Christ.</small>
+            </span>
+        </a>
+
+        <div class="cns-nav-account">
+
+            <a href="profile.html" class="cns-nav-link">
+                <span>My Profile</span>
+            </a>
+
+            <button
+                type="button"
+                id="notificationSignOutButton"
+                class="cns-signout-button"
+            >
+                <span>Sign Out</span>
+            </button>
+
+        </div>
+
+    </div>
+
+    <nav class="cns-nav-links" aria-label="Main navigation">
+
+        <a href="dashboard.html" class="cns-nav-link">
+            Home
+        </a>
+
+        <a href="users.html" class="cns-nav-link">
+            Discover
+        </a>
+
+        <a
+            href="friends.html"
+            class="cns-nav-link"
+        >
+            Friends
+        </a>
+
+        <a
+            href="notifications.html"
+            class="cns-nav-link active"
+            aria-current="page"
+        >
+            Notifications
+        </a>
+
+        <a href="messages.html" class="cns-nav-link">
+            Messages
+        </a>
+
+    </nav>
+
+</header>
+
+<main class="notifications-page">
+
+    <section class="heading">
+        <div>
+            <h1>Notifications</h1>
+            <p>Stay updated with activity on FaithCircle.</p>
+        </div>
+
+        <button
+            class="mark-all"
+            id="markAllButton"
+            type="button"
+            disabled
+        >
+            Mark all as read
+        </button>
+    </section>
+
+    <section class="summary">
+        <strong>Your activity</strong>
+
+        <span class="unread-count" id="unreadCount">
+            0 unread
+        </span>
+    </section>
+
+    <section
+        id="notificationList"
+        class="notification-list"
+        aria-live="polite"
+    >
+        <div class="loading">
+            Loading your notifications...
+        </div>
+    </section>
+
+    <div
+        class="load-more-container"
+        id="loadMoreContainer"
+        hidden
+    >
+        <button
+            class="load-more"
+            id="loadMoreButton"
+            type="button"
+        >
+            Load more
+        </button>
+    </div>
+
+</main>
+
+<script>
+(() => {
+    "use strict";
+
+    const client = window.supabaseClient;
+
+    const $ = id => document.getElementById(id);
+
+    const list = $("notificationList");
+    const unreadCount = $("unreadCount");
+    const markAllButton = $("markAllButton");
+    const loadMoreButton = $("loadMoreButton");
+    const loadMoreContainer = $("loadMoreContainer");
+    const signOutButton = $("notificationSignOutButton");
+
+    let currentUser = null;
+    let notifications = [];
+    let loading = false;
+    let offset = 0;
+    let hasMore = false;
+
+    const PAGE_SIZE = 20;
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(/[&<>"']/g, character => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+        })[character]);
+    }
+
+    // Icons for existing and new notification types.
+    function iconFor(type) {
+        const icons = {
+            follow: "👤",
+            like: "❤️",
+            comment: "💬",
+            friend_request: "👋",
+            friend_accepted: "🎉"
+        };
+
+        return icons[type] || "🔔";
+    }
+
+    // Where each notification should take the user.
+    function getNotificationLink(item) {
+        switch (item.type) {
+            case "friend_request":
+                return "friends.html";
+
+            case "friend_accepted":
+                return "friends.html";
+
+            case "follow":
+                return item.actor_id
+                    ? "profile.html?id=" +
+                      encodeURIComponent(item.actor_id)
+                    : "users.html";
+
+            case "like":
+            case "comment":
+                return item.post_id
+                    ? "dashboard.html#post-" +
+                      encodeURIComponent(item.post_id)
+                    : "dashboard.html";
+
+            default:
+                return "notifications.html";
+        }
+    }
+
+    function getActionLabel(type) {
+        switch (type) {
+            case "friend_request":
+                return "View Friend Request";
+
+            case "friend_accepted":
+                return "View Friends";
+
+            case "follow":
+                return "View Profile";
+
+            case "like":
+            case "comment":
+                return "View Post";
+
+            default:
+                return "View Activity";
+        }
+    }
+
+    function timeAgo(dateValue) {
+        if (!dateValue) return "Recently";
+
+        const date = new Date(dateValue);
+
+        if (Number.isNaN(date.getTime())) {
+            return "Recently";
+        }
+
+        const seconds = Math.max(
+            0,
+            Math.floor((Date.now() - date.getTime()) / 1000)
+        );
+
+        if (seconds < 60) return "Just now";
+
+        if (seconds < 3600) {
+            const minutes = Math.floor(seconds / 60);
+
+            return minutes +
+                (minutes === 1 ? " minute ago" : " minutes ago");
+        }
+
+        if (seconds < 86400) {
+            const hours = Math.floor(seconds / 3600);
+
+            return hours +
+                (hours === 1 ? " hour ago" : " hours ago");
+        }
+
+        if (seconds < 604800) {
+            const days = Math.floor(seconds / 86400);
+
+            return days +
+                (days === 1 ? " day ago" : " days ago");
+        }
+
+        return date.toLocaleDateString();
+    }
+
+    function updateUnreadCount() {
+        const unread = notifications.filter(
+            item => !item.is_read
+        ).length;
+
+        unreadCount.textContent = unread + " unread";
+
+        markAllButton.disabled = unread === 0;
+    }
+
+    function renderEmptyState() {
+        list.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">🔔</div>
+                <h3>No notifications yet</h3>
+                <p>
+                    Friend requests, follows, likes and comments
+                    will appear here.
+                </p>
+            </div>
+        `;
+
+        loadMoreContainer.hidden = true;
+    }
+
+    function createNotificationCard(item) {
+        const article = document.createElement("article");
+
+        article.className =
+            "notification" + (item.is_read ? "" : " unread");
+
+        const link = getNotificationLink(item);
+
+        article.innerHTML = `
+            <div class="notification-icon">
+                ${iconFor(item.type)}
+            </div>
+
+            <div class="notification-content">
+
+                <p class="notification-message">
+                    ${escapeHTML(
+                        item.message || "You have a new notification."
+                    )}
+
+                    ${
+                        item.is_read
+                            ? ""
+                            : '<span class="dot"></span>'
+                    }
+                </p>
+
+                <div class="notification-time">
+                    ${escapeHTML(timeAgo(item.created_at))}
+                </div>
+
+                <div class="notification-actions">
+
+                    <a
+                        class="action-button"
+                        href="${escapeHTML(link)}"
+                    >
+                        ${getActionLabel(item.type)}
+                    </a>
+
+                    ${
+                        !item.is_read
+                            ? `
+                                <button
+                                    class="action-button mark-read"
+                                    type="button"
+                                >
+                                    Mark as read
+                                </button>
+                            `
+                            : ""
+                    }
+
+                </div>
+
+            </div>
+        `;
+
+        const markReadButton =
+            article.querySelector(".mark-read");
+
+        if (markReadButton) {
+            markReadButton.addEventListener("click", async () => {
+                markReadButton.disabled = true;
+
+                await markOneAsRead(item.id);
+            });
+        }
+
+        const actionLink = article.querySelector(
+            ".notification-actions a"
+        );
+
+        actionLink.addEventListener("click", async () => {
+            if (!item.is_read) {
+                await markOneAsRead(item.id, false);
+            }
+        });
+
+        return article;
+    }
+
+    function renderNotifications() {
+        list.replaceChildren();
+
+        if (notifications.length === 0) {
+            renderEmptyState();
+            updateUnreadCount();
+            return;
+        }
+
+        const fragment = document.createDocumentFragment();
+
+        notifications.forEach(item => {
+            fragment.appendChild(
+                createNotificationCard(item)
+            );
+        });
+
+        list.appendChild(fragment);
+
+        updateUnreadCount();
+
+        loadMoreContainer.hidden = !hasMore;
+    }
+
+    async function loadNotifications(reset = false) {
+        if (!client || !currentUser || loading) return;
+
+        if (!reset && !hasMore) return;
+
+        loading = true;
+
+        loadMoreButton.disabled = true;
+        loadMoreButton.textContent = "Loading...";
+
+        if (reset) {
+            offset = 0;
+            notifications = [];
+            hasMore = false;
+
+            list.innerHTML = `
+                <div class="loading">
+                    Loading your notifications...
+                </div>
+            `;
+        }
+
+        try {
+            /*
+             * The actor relationship is optional in the UI.
+             * This query uses the standard notification columns
+             * from the existing FaithCircle implementation.
+             */
+
+            const { data, error } = await client
+                .from("notifications")
+                .select("*")
+                .eq("recipient_id", currentUser.id)
+                .order("created_at", { ascending: false })
+                .range(offset, offset + PAGE_SIZE - 1);
+
+            if (error) throw error;
+
+            const newItems = data || [];
+
+            notifications = reset
+                ? newItems
+                : notifications.concat(newItems);
+
+            offset += newItems.length;
+
+            hasMore = newItems.length === PAGE_SIZE;
+
+            renderNotifications();
+
+        } catch (error) {
+            console.error(
+                "Notification loading error:",
+                error
+            );
+
+            list.innerHTML = `
+                <div class="error-state">
+                    <h3>Couldn't load notifications</h3>
+                    <p class="error-message"></p>
+
+                    <button
+                        class="retry-button"
+                        id="retryButton"
+                        type="button"
+                    >
+                        Try again
+                    </button>
+                </div>
+            `;
+
+            list.querySelector(".error-message").textContent =
+                error.message || "Please try again.";
+
+            $("retryButton").addEventListener("click", () => {
+                loadNotifications(true);
+            });
+
+        } finally {
+            loading = false;
+
+            loadMoreButton.disabled = false;
+            loadMoreButton.textContent = "Load more";
+        }
+    }
+
+    async function markOneAsRead(notificationId, rerender = true) {
+        if (!client || !currentUser) return;
+
+        try {
+            const { error } = await client
+                .from("notifications")
+                .update({ is_read: true })
+                .eq("id", notificationId)
+                .eq("recipient_id", currentUser.id);
+
+            if (error) throw error;
+
+            const item = notifications.find(
+                notification =>
+                    notification.id === notificationId
+            );
+
+            if (item) {
+                item.is_read = true;
+            }
+
+            if (rerender) {
+                renderNotifications();
+            } else {
+                updateUnreadCount();
+            }
+
+        } catch (error) {
+            console.error(
+                "Mark notification as read failed:",
+                error
+            );
+
+            await Swal.fire({
+                icon: "error",
+                title: "Unable to update",
+                text: error.message ||
+                    "The notification could not be marked as read."
+            });
+        }
+    }
+
+    async function markAllAsRead() {
+        if (!client || !currentUser) return;
+
+        const unread = notifications.filter(
+            item => !item.is_read
+        );
+
+        if (!unread.length) return;
+
+        markAllButton.disabled = true;
+        markAllButton.textContent = "Updating...";
+
+        try {
+            const { error } = await client
+                .from("notifications")
+                .update({ is_read: true })
+                .eq("recipient_id", currentUser.id)
+                .eq("is_read", false);
+
+            if (error) throw error;
+
+            notifications.forEach(item => {
+                item.is_read = true;
+            });
+
+            renderNotifications();
+
+            await Swal.fire({
+                icon: "success",
+                title: "All caught up!",
+                text: "Your notifications have been marked as read.",
+                timer: 1500,
+                showConfirmButton: false
+            });
+
+        } catch (error) {
+            console.error(
+                "Mark all as read failed:",
+                error
+            );
+
+            await Swal.fire({
+                icon: "error",
+                title: "Update failed",
+                text: error.message || "Please try again."
+            });
+
+        } finally {
+            markAllButton.textContent = "Mark all as read";
+
+            updateUnreadCount();
+        }
+    }
+
+    async function initialize() {
+        if (!client) {
+            list.innerHTML = `
+                <div class="error-state">
+                    <h3>Configuration unavailable</h3>
+                    <p>
+                        Check that supabase-config.js loads correctly
+                        and creates window.supabaseClient.
+                    </p>
+                </div>
+            `;
+
+            return;
+        }
+
+        try {
+            const {
+                data,
+                error
+            } = await client.auth.getSession();
+
+            if (error) throw error;
+
+            currentUser = data.session?.user || null;
+
+            if (!currentUser) {
+                window.location.replace("login.html");
+                return;
+            }
+
+            await loadNotifications(true);
+
+        } catch (error) {
+            console.error(
+                "Notification initialization error:",
+                error
+            );
+
+            list.innerHTML = `
+                <div class="error-state">
+                    <h3>Something went wrong</h3>
+                    <p class="error-message"></p>
+
+                    <button
+                        class="retry-button"
+                        id="retryButton"
+                        type="button"
+                    >
+                        Try again
+                    </button>
+                </div>
+            `;
+
+            list.querySelector(".error-message").textContent =
+                error.message || "Please try again.";
+
+            $("retryButton").addEventListener(
+                "click",
+                initialize
+            );
+        }
+    }
+
+    // MARK ALL AS READ
+    markAllButton.addEventListener(
+        "click",
+        markAllAsRead
+    );
+
+    // LOAD MORE
+    loadMoreButton.addEventListener("click", () => {
+        loadNotifications(false);
+    });
+
+    // SIGN OUT
+    signOutButton.addEventListener("click", async () => {
+        const confirmation = await Swal.fire({
+            title: "Sign out?",
+            text: "Are you sure you want to sign out of FaithCircle?",
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonText: "Yes, sign out",
+            cancelButtonText: "Cancel",
+            confirmButtonColor: "#0b1f3a"
+        });
+
+        if (!confirmation.isConfirmed) return;
+
+        signOutButton.disabled = true;
+
+        try {
+            const { error } = await client.auth.signOut();
+
+            if (error) throw error;
+
+            window.location.replace("login.html");
+
+        } catch (error) {
+            console.error("Sign-out failed:", error);
+
+            await Swal.fire({
+                icon: "error",
+                title: "Sign-out failed",
+                text: error.message || "Please try again."
+            });
+
+            signOutButton.disabled = false;
+        }
+    });
+
+    // START
+    initialize();
+
+})();
+</script>
+
+</body>
+</html>

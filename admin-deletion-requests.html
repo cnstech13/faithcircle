@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+    <meta name="theme-color" content="#0b1f3a">
+
+    <title>Account Deletion Requests | FaithCircle</title>
+
+    <link rel="stylesheet" href="global.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+  <script src="FaithCircle-live-enhancements.js" defer></script>
+
+    <style>
+        body {
+            margin: 0;
+            background: #f4f6fb;
+            color: #172033;
+            font-family: Arial, sans-serif;
+        }
+
+        .admin-header {
+            padding: 20px;
+            background: #0b1f3a;
+            color: white;
+        }
+
+        .admin-header h1 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .admin-header p {
+            margin-bottom: 0;
+            color: #d8dfeb;
+        }
+
+        .container {
+            width: min(1000px, 92%);
+            margin: 28px auto;
+        }
+
+        .notice {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            background: #fff7df;
+            color: #765400;
+            line-height: 1.6;
+        }
+
+        .request-card {
+            padding: 20px;
+            margin-bottom: 16px;
+            border-radius: 14px;
+            background: white;
+            box-shadow: 0 4px 18px #0000000d;
+        }
+
+        .request-card h3 {
+            margin-top: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .request-card p {
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #fff0c2;
+            color: #765400;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+        }
+
+        button {
+            border: 0;
+            padding: 11px 16px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .approve {
+            background: #15803d;
+        }
+
+        .reject {
+            background: #dc2626;
+        }
+
+        .refresh {
+            background: #17345d;
+            margin-bottom: 20px;
+        }
+
+        #message {
+            margin: 15px 0;
+            line-height: 1.6;
+        }
+
+        .empty {
+            padding: 25px;
+            text-align: center;
+            background: white;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="admin-header">
+    <h1>FaithCircle Admin</h1>
+    <p>Account Deletion Requests</p>
+</header>
+
+<main class="container">
+
+    <div class="notice">
+        <strong>Important:</strong>
+        Approving a request does not delete the account.
+        Permanent deletion must be completed separately
+        through a secure administrative process.
+    </div>
+
+    <button
+        type="button"
+        class="refresh"
+        id="refreshBtn"
+    >
+        Refresh Requests
+    </button>
+
+    <div id="message" role="status" aria-live="polite">
+        Checking administrator access...
+    </div>
+
+    <section id="requestsList"></section>
+
+</main>
+
+<script>
+"use strict";
+
+(async function () {
+    const db = window.supabaseClient;
+
+    const message = document.getElementById("message");
+    const requestsList = document.getElementById("requestsList");
+    const refreshBtn = document.getElementById("refreshBtn");
+
+    function showMessage(text) {
+        message.textContent = text;
+    }
+
+    function escapeHTML(value) {
+        return String(value ?? "").replace(
+            /[&<>"']/g,
+            character => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[character]
+        );
+    }
+
+    if (!db) {
+        showMessage(
+            "Supabase is not configured. Check supabase-config.js."
+        );
+        return;
+    }
+
+    // Require a logged-in user.
+    const {
+        data: { user },
+        error: authError
+    } = await db.auth.getUser();
+
+    if (authError || !user) {
+        window.location.replace("login.html");
+        return;
+    }
+
+    /*
+     * IMPORTANT:
+     * Replace this basic check with your actual FaithCircle
+     * administrator-role verification before deployment.
+     *
+     * Being logged in does not make someone an admin.
+     */
+    const { data: profile, error: profileError } = await db
+        .from("profiles")
+        .select("id, role")
+        .eq("id", user.id)
+        .maybeSingle();
+
+    if (profileError) {
+        showMessage(
+            "Could not verify your administrator role: " +
+            profileError.message
+        );
+        return;
+    }
+
+    if (!profile || profile.role !== "admin") {
+        showMessage(
+            "Access denied. An administrator account is required."
+        );
+        return;
+    }
+
+    async function updateStatus(requestId, status) {
+        const confirmed = window.confirm(
+            "Are you sure you want to mark this request as " +
+            status + "?"
+        );
+
+        if (!confirmed) return;
+
+        try {
+            const { error } = await db
+                .from("account_deletion_requests")
+                .update({
+                    status: status,
+                    reviewed_at: new Date().toISOString()
+                })
+                .eq("id", requestId)
+                .eq("status", "pending");
+
+            if (error) throw error;
+
+            showMessage(
+                "Request updated. This action did not delete the account."
+            );
+
+            await loadRequests();
+
+        } catch (error) {
+            console.error(error);
+
+            showMessage(
+                "Could not update request: " + error.message
+            );
+        }
+    }
+
+    async function loadRequests() {
+        requestsList.replaceChildren();
+        showMessage("Loading deletion requests...");
+
+        try {
+            const { data, error } = await db
+                .from("account_deletion_requests")
+                .select(
+                    "id, user_id, requested_at, status"
+                )
+                .order("requested_at", {
+                    ascending: false
+                });
+
+            if (error) throw error;
+
+            if (!data || data.length === 0) {
+                showMessage("No deletion requests found.");
+                return;
+            }
+
+            showMessage(
+                "Total deletion requests: " + data.length
+            );
+
+            data.forEach(request => {
+                const card = document.createElement("article");
+                card.className = "request-card";
+
+                const date = request.requested_at
+                    ? new Date(
+                        request.requested_at
+                    ).toLocaleString()
+                    : "Unknown";
+
+                card.innerHTML = `
+                    <h3>Account: ${escapeHTML(request.user_id)}</h3>
+
+                    <p>
+                        <strong>Requested:</strong>
+                        ${escapeHTML(date)}
+                    </p>
+
+                    <p>
+                        <strong>Status:</strong>
+                        <span class="status">
+                            ${escapeHTML(request.status)}
+                        </span>
+                    </p>
+
+                    <div class="actions"></div>
+                `;
+
+                const actions = card.querySelector(".actions");
+
+                if (request.status === "pending") {
+                    const approveBtn =
+                        document.createElement("button");
+
+                    approveBtn.className = "approve";
+                    approveBtn.textContent = "Approve Request";
+
+                    approveBtn.addEventListener("click", () => {
+                        updateStatus(request.id, "approved");
+                    });
+
+                    const rejectBtn =
+                        document.createElement("button");
+
+                    rejectBtn.className = "reject";
+                    rejectBtn.textContent = "Reject Request";
+
+                    rejectBtn.addEventListener("click", () => {
+                        updateStatus(request.id, "rejected");
+                    });
+
+                    actions.append(approveBtn, rejectBtn);
+                }
+
+                requestsList.appendChild(card);
+            });
+
+        } catch (error) {
+            console.error(error);
+
+            showMessage(
+                "Could not load requests. Check table permissions: " +
+                error.message
+            );
+        }
+    }
+
+    refreshBtn.addEventListener("click", loadRequests);
+
+    await loadRequests();
+})();
+</script>
+
+</body>
+</html>
