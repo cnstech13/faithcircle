@@ -1027,14 +1027,39 @@ try {
       }
 
       try {
-        const {
-          data,
-          error
-        } = await supabaseClient
-          .from("posts")
-          .update({
+
+    // Check edited content using FaithCircle moderation.
+    const moderation = await moderateTextContent(newContent);
+
+    if (moderation.status === "blocked") {
+        showError(
+            "This edited post violates FaithCircle's content guidelines."
+        );
+        return;
+    }
+
+    if (moderation.status === "review") {
+        showInfo(
+            "This edited post requires administrator review."
+        );
+        return;
+    }
+
+    if (moderation.status !== "approved") {
+        throw new Error(
+            "The edited post could not be approved. Please try again."
+        );
+    }
+
+    // Update the post only after moderation approval.
+    const {
+        data,
+        error
+    } = await supabaseClient
+        .from("posts")
+        .update({
             content: newContent
-          })
+        })
           .eq("id", post.id)
           .eq("user_id", currentUser.id)
           .select("id")
