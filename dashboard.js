@@ -312,27 +312,59 @@ async function moderateTextContent(text) {
     );
 }
 
-// Unknown and review statuses must never be published.
-function requireModerationApproval(result, contentType) {
-    if (!result || result.status !== "approved") {
-        if (result && result.status === "blocked") {
-            throw new Error(
-                `This ${contentType} violates FaithCircle's community guidelines and has been blocked.`
-            );
-        }
+// =========================================
+// FAITHCIRCLE MODERATION MESSAGES
+// =========================================
 
-        if (result && result.status === "review") {
-            throw new Error(
-                `This ${contentType} could not be automatically approved and will not be published.`
-            );
-        }
+function getModerationMessage(contentType) {
 
-        throw new Error(
-            `The ${contentType} could not be approved. Please try again later.`
-        );
-    }
+    const messages = {
+        post: "Your post contains sexually explicit content that violates FaithCircle's Community Guidelines. Please revise it.",
+
+        "edited post": "Your post contains sexually explicit content that violates FaithCircle's Community Guidelines. Please revise it.",
+
+        comment: "Your comment contains sexually explicit content that violates FaithCircle's Community Guidelines. Please revise it.",
+
+        image: "This image contains inappropriate sexual content and cannot be published on FaithCircle.",
+
+        video: "This video contains inappropriate sexual content and cannot be published on FaithCircle."
+    };
+
+    return messages[contentType] ||
+        "This content violates FaithCircle's Community Guidelines and cannot be published.";
 }
 
+
+// =========================================
+// CHECK MODERATION APPROVAL
+// =========================================
+
+function requireModerationApproval(result, contentType) {
+
+    // Only approved content can be published.
+    if (result && result.status === "approved") {
+        return;
+    }
+
+    // Block sexually explicit or otherwise prohibited content.
+    if (result && result.status === "blocked") {
+        throw new Error(
+            getModerationMessage(contentType)
+        );
+    }
+
+    // Do not publish content awaiting review.
+    if (result && result.status === "review") {
+        throw new Error(
+            "This content could not be automatically approved and cannot be published."
+        );
+    }
+
+    // Fail closed if moderation fails or returns an unknown status.
+    throw new Error(
+        "Content moderation could not be completed. Please try again."
+    );
+}
 // =========================================
 // IMAGE MODERATION
 // =========================================
